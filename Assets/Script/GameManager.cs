@@ -37,8 +37,6 @@ public class GameManager : MonoBehaviour
     /// <summary>è”Ô‚ğŠÇ—‚·‚é</summary>
     [SerializeField] int m_order = 0;
 
-
-
     void Start()
     {
 
@@ -63,6 +61,16 @@ public class GameManager : MonoBehaviour
             return;
         }
         m_entryPanel.SetActive(false);
+        m_players = new PlayerController[m_peopleNum];
+        for (int i = 0; i < m_peopleNum; i++)
+        {
+            GameObject car = Instantiate(m_carPrefab);
+            car.transform.position = new Vector3(i * 3, 0, 0);
+            m_players[i] = car.GetComponent<PlayerController>();
+            EntryNamePrefab en = m_entryNameDisplay.transform.GetChild(i).GetComponent<EntryNamePrefab>();
+            m_players[i].Set();
+            m_players[i].AddHuman(en.Seibetu,en.Name);
+        }
     }
     /// <summary>
     /// ƒGƒ“ƒgƒŠ[‚³‚¹‚é
@@ -81,7 +89,9 @@ public class GameManager : MonoBehaviour
         }
         m_peopleNum++;
         GameObject player = Instantiate(m_entryNamePrehab);
-        player.transform.GetChild(0).GetComponent<Text>().text = m_entryName.text;
+        EntryNamePrefab en = player.GetComponent<EntryNamePrefab>();
+        en.Name= m_entryName.text;
+        en.Seibetu = seibetu;
         player.transform.SetParent(m_entryNameDisplay.transform);
         player.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
         m_entryNameDisplay.GetComponent<RectTransform>().sizeDelta = new Vector2(0, m_peopleNum * 50);

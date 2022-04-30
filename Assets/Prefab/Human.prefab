@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 876f5230b4f184847b580e2eb71950a5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -159,7 +159,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 872f34e4d392bf44aaa4eec6a9ca11b8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -204,6 +204,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1806464685458258247}
+  - component: {fileID: 3624222048165249206}
   m_Layer: 0
   m_Name: Human
   m_TagString: Untagged
@@ -226,6 +227,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3624222048165249206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1806464685458258244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cec2eb4d360b17e4786c216eb217df91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_seibetu: 
+  m_bodyColors:
+  - {fileID: 2100000, guid: a884e7416e6e30b44a587becea2d3d2c, type: 2}
+  - {fileID: 2100000, guid: 872f34e4d392bf44aaa4eec6a9ca11b8, type: 2}
+  m_body: {fileID: 1806464685390915034}
 --- !u!1 &1806464685491457870
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,7 +305,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 876f5230b4f184847b580e2eb71950a5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

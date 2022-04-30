@@ -281,6 +281,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_name: 
+  m_money: 0
   m_location: 
   m_Seats:
   - {fileID: 4192577846530829763}
@@ -289,6 +290,9 @@ MonoBehaviour:
   - {fileID: 431867842631351103}
   - {fileID: 5478300958199588166}
   - {fileID: 3480119791429099270}
+  m_sittings: 
+  m_family: []
+  m_humanPrefab: {fileID: 1806464685458258244, guid: 468fda027fd50a1458d2cce93100ff89, type: 3}
 --- !u!1 &3032777190564943586
 GameObject:
   m_ObjectHideFlags: 0
