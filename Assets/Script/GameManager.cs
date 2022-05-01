@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject m_entryPanel = null;
 
     Coroutine m_coroutine;
+    /// <summary>最初のマス</summary>
+    [SerializeField] RoadController m_first = null;
 
     //ゲームで使う変数
     /// <summary>車のプレハブ</summary>
@@ -39,7 +41,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-
+        m_first.PositionSetUp();
     }
 
     void Update()
