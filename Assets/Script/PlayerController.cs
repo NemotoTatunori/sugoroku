@@ -21,10 +21,6 @@ public class PlayerController : MonoBehaviour
     /// <summary>人のプレハブ</summary>
     [SerializeField] GameObject m_humanPrefab = null;
     
-    void Update()
-    {
-
-    }
     public void Set()
     {
         m_sittings = new bool[m_Seats.Length];
@@ -47,5 +43,15 @@ public class PlayerController : MonoBehaviour
         GameObject h = Instantiate(m_humanPrefab, m_Seats[m_familyNum - 1]);
         m_family[m_familyNum - 1] = h.GetComponent<Human>();
         m_family[m_familyNum - 1].Seting(seibetu,name);
+    }
+
+    public void MoveStart(int m)
+    {
+        StartCoroutine(Move(m));
+    }
+
+    IEnumerator Move(int m)
+    {
+        yield return null;
     }
 }

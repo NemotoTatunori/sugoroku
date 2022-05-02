@@ -5,9 +5,11 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    //エントリーパネルで使う変数
     /// <summary>最大人数</summary>
     int m_maxEntry = 30;
+    Coroutine m_coroutine;
+
+    //エントリーパネルで使う変数
     /// <summary>参加する人の名前を入力する場所</summary>
     [SerializeField] Text m_entryName = null;
     /// <summary>参加する人の名前を表示するプレハブ</summary>
@@ -27,11 +29,10 @@ public class GameManager : MonoBehaviour
     /// <summary>エントリーパネル</summary>
     [SerializeField] GameObject m_entryPanel = null;
 
-    Coroutine m_coroutine;
-    /// <summary>最初のマス</summary>
-    [SerializeField] RoadController m_first = null;
 
     //ゲームで使う変数
+    /// <summary>最初のマス</summary>
+    [SerializeField] RoadController m_first = null;
     /// <summary>車のプレハブ</summary>
     [SerializeField] GameObject m_carPrefab = null;
     /// <summary>プレイヤーたちの情報</summary>
@@ -48,6 +49,8 @@ public class GameManager : MonoBehaviour
     {
 
     }
+
+    //エントリーパネルで使うメソッド
     /// <summary>
     /// ゲームをスタートさせる
     /// </summary>
@@ -64,14 +67,24 @@ public class GameManager : MonoBehaviour
         }
         m_entryPanel.SetActive(false);
         m_players = new PlayerController[m_peopleNum];
+        float px = (m_peopleNum - 1) * -2.5f;
+        if (m_peopleNum >= 11) { px = 9 * -2.5f; }
+        int x = 0;
+        int z = 0;
         for (int i = 0; i < m_peopleNum; i++)
         {
             GameObject car = Instantiate(m_carPrefab);
-            car.transform.position = new Vector3(i * 3, 0, 0);
+            car.transform.position = new Vector3(px + x * 5, 0, z * -10);
             m_players[i] = car.GetComponent<PlayerController>();
             EntryNamePrefab en = m_entryNameDisplay.transform.GetChild(i).GetComponent<EntryNamePrefab>();
             m_players[i].Set();
-            m_players[i].AddHuman(en.Seibetu,en.Name);
+            m_players[i].AddHuman(en.Seibetu, en.Name);
+            x++;
+            if (x >= 10)
+            {
+                x = 0;
+                z++;
+            }
         }
     }
     /// <summary>
@@ -92,7 +105,7 @@ public class GameManager : MonoBehaviour
         m_peopleNum++;
         GameObject player = Instantiate(m_entryNamePrehab);
         EntryNamePrefab en = player.GetComponent<EntryNamePrefab>();
-        en.Name= m_entryName.text;
+        en.Name = m_entryName.text;
         en.Seibetu = seibetu;
         player.transform.SetParent(m_entryNameDisplay.transform);
         player.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
@@ -117,7 +130,11 @@ public class GameManager : MonoBehaviour
         Destroy(name);
         m_peopleNumText.text = m_peopleNum + "人";
     }
-
+    /// <summary>
+    /// 警告テキスト表示
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     IEnumerator Caveat(string text)
     {
         m_caveatText.SetActive(true);
