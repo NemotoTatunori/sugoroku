@@ -12,47 +12,134 @@ public class RoadController : MonoBehaviour
     /// <summary>車が止まる場所</summary>
     [SerializeField] Transform m_stopPoint = null;
     /// <summary>次のマスの接続部</summary>
-    [SerializeField] Transform[] m_nextConnect = null;
+    [SerializeField] protected Transform[] m_nextConnect = null;
     /// <summary>前のマスの接続部</summary>
-    [SerializeField] Transform m_prevConnect = null;
+    [SerializeField] Transform[] m_prevConnect = null;
     /// <summary>次のマス</summary>
-    [SerializeField] RoadController[] m_nextRoads = null;
+    [SerializeField] protected RoadController[] m_nextRoads = null;
     /// <summary>前のマス</summary>
-    [SerializeField] RoadController m_prevRoads = null;
+    [SerializeField] protected RoadController[] m_prevRoads = null;
     /// <summary>マスのテキスト</summary>
     [SerializeField] string m_eventText = null;
-
-    public Transform PrevConnect
+    /// <summary>位置補正のフラグ</summary>
+    bool m_positionCorrection = false;
+    int m_branchNumber;
+    /// <summary>前のマスの接続部のプロパティ</summary>
+    public Transform[] PrevConnect
     {
         get => m_prevConnect;
+    }
+    /// <summary>マス番号のプロパティ</summary>
+    public string RoadNumber
+    {
+        get => m_roadNumber;
+        set
+        {
+            m_roadNumber = value;
+            m_roadNumberText.text = m_roadNumber;
+        }
+    }
+    /// <summary>位置補正のプロパティ</summary>
+    public bool PositionCorrection
+    {
+        get => m_positionCorrection;
     }
 
     void Start()
     {
-        m_roadNumberText.text = m_roadNumber;
+        if (m_roadNumber != "")
+        {
+            m_roadNumberText.text = m_roadNumber;
+        }
+    }
+    /// <summary>
+    /// マス情報を設定する
+    /// </summary>
+    public virtual void RoadSetUp(RoadController road, string rn)
+    {
+        NumberSet(rn);
+
+        PrevRoadSet(road);
+
+        //次のマスに情報を送る
+        if (m_nextRoads == null)
+        {
+            return;
+        }
+        if (!m_nextRoads[0].PositionCorrection)
+        {
+            Vector3 now = m_nextConnect[0].position;
+            Vector3 next = m_nextRoads[0].PrevConnect[0].position;
+            Vector3 a = m_nextRoads[0].gameObject.transform.position;
+            m_nextRoads[0].PositionSetUp(a + (now - next));
+        }
+        m_nextRoads[0].RoadSetUp(this, RoadNumber);
+
+    }
+    /// <summary>
+    /// 一つ前のマスを設定する
+    /// </summary>
+    /// <param name="road">一つ前のマス</param>
+    protected void PrevRoadSet(RoadController road)
+    {
+        if (m_prevRoads.Length == 0)
+        {
+            m_prevRoads = new RoadController[1];
+            m_prevRoads[0] = road;
+        }
+        else
+        {
+            RoadController[] prevRoads = m_prevRoads;
+            m_prevRoads = new RoadController[prevRoads.Length + 1];
+            int i = 0;
+            while (i < m_prevRoads.Length - 1)
+            {
+                m_prevRoads[i] = prevRoads[i];
+                i++;
+            }
+            m_prevRoads[i] = road;
+        }
     }
 
-    void Update()
+    /// <summary>
+    /// マス番号を設定する
+    /// </summary>
+    /// <param name="rn">前のマスの番号</param>
+    protected virtual void NumberSet(string rn)
     {
-        
+        if (RoadNumber == "")
+        {
+            string[] sn = rn.Split(char.Parse("-"));
+            int[] n = new int[sn.Length];
+            for (int i = 0; i < n.Length; i++)
+            {
+                n[i] = int.Parse(sn[i]);
+            }
+            n[2]++;
+            string an = "";
+            for (int i = 0; i < n.Length; i++)
+            {
+                an += n[i].ToString();
+                if (i < n.Length - 1)
+                {
+                    an += char.Parse("-");
+                }
+            }
+            RoadNumber = an;
+        }
     }
 
     /// <summary>
     /// マスの位置を調節する
     /// </summary>
-    public void PositionSetUp()
+    public void PositionSetUp(Vector3 p)
     {
-        if (m_nextRoads == null)
-        {
-            return;
-        }
-        for (int i = 0; i < m_nextRoads.Length; i++)
-        {
-            Vector3 now = m_nextConnect[i].position;
-            Vector3 next = m_nextRoads[i].PrevConnect.position;
-            Vector3 a = m_nextRoads[i].gameObject.transform.position;
-            m_nextRoads[i].gameObject.transform.position = a + (now - next);
-            m_nextRoads[i].PositionSetUp();
-        }
+        m_positionCorrection = true;
+        this.transform.position = p;
+    }
+
+    public RoadController[] Road()
+    {
+        return m_nextRoads;
     }
 }

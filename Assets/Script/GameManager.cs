@@ -37,17 +37,24 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject m_carPrefab = null;
     /// <summary>プレイヤーたちの情報</summary>
     [SerializeField] PlayerController[] m_players = null;
+    /// <summary>マスの配列</summary>
+    RoadController[,,] m_Roads;
     /// <summary>手番を管理する</summary>
     [SerializeField] int m_order = 0;
 
     void Start()
     {
-        m_first.PositionSetUp();
+        m_first.RoadSetUp(null, m_first.RoadNumber);
     }
 
     void Update()
     {
 
+    }
+
+    void GetRoads()
+    {
+        //m_Roads = new RoadController[0,0,0];
     }
 
     //エントリーパネルで使うメソッド

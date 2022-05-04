@@ -283,9 +283,10 @@ MonoBehaviour:
   m_stopPoint: {fileID: 1896841000647576133}
   m_nextConnect:
   - {fileID: 631181761211797881}
-  m_prevConnect: {fileID: 3749856218347524733}
+  m_prevConnect:
+  - {fileID: 3749856218347524733}
   m_nextRoads: []
-  m_prevRoads: {fileID: 0}
+  m_prevRoads: []
   m_eventText: 
 --- !u!1 &1896841001067789105
 GameObject:
@@ -980,7 +981,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 1-1
+  m_Text: 1-0-0
 --- !u!1 &8566534587240740937
 GameObject:
   m_ObjectHideFlags: 0
