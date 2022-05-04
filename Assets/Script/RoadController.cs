@@ -57,7 +57,10 @@ public class RoadController : MonoBehaviour
     /// </summary>
     public virtual void RoadSetUp(RoadController road, string rn)
     {
-        NumberSet(rn);
+        if (RoadNumber == "")
+        {
+            RoadNumber = rn;
+        }
 
         PrevRoadSet(road);
 
@@ -73,11 +76,10 @@ public class RoadController : MonoBehaviour
             Vector3 a = m_nextRoads[0].gameObject.transform.position;
             m_nextRoads[0].PositionSetUp(a + (now - next));
         }
-        m_nextRoads[0].RoadSetUp(this, RoadNumber);
-
+        m_nextRoads[0].RoadSetUp(this, NextNumber(RoadNumber,0));
     }
     /// <summary>
-    /// 一つ前のマスを設定する
+    /// 一つ前のマスを登録する
     /// </summary>
     /// <param name="road">一つ前のマス</param>
     protected void PrevRoadSet(RoadController road)
@@ -105,28 +107,25 @@ public class RoadController : MonoBehaviour
     /// マス番号を設定する
     /// </summary>
     /// <param name="rn">前のマスの番号</param>
-    protected virtual void NumberSet(string rn)
+    protected virtual string NextNumber(string rn, int bn)
     {
-        if (RoadNumber == "")
+        string[] sn = rn.Split(char.Parse("-"));
+        int[] n = new int[sn.Length];
+        for (int i = 0; i < n.Length; i++)
         {
-            string[] sn = rn.Split(char.Parse("-"));
-            int[] n = new int[sn.Length];
-            for (int i = 0; i < n.Length; i++)
-            {
-                n[i] = int.Parse(sn[i]);
-            }
-            n[2]++;
-            string an = "";
-            for (int i = 0; i < n.Length; i++)
-            {
-                an += n[i].ToString();
-                if (i < n.Length - 1)
-                {
-                    an += char.Parse("-");
-                }
-            }
-            RoadNumber = an;
+            n[i] = int.Parse(sn[i]);
         }
+        n[2]++;
+        string an = "";
+        for (int i = 0; i < n.Length; i++)
+        {
+            an += n[i].ToString();
+            if (i < n.Length - 1)
+            {
+                an += char.Parse("-");
+            }
+        }
+        return an;
     }
 
     /// <summary>
