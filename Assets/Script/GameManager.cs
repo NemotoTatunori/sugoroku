@@ -44,7 +44,15 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        m_Roads = new RoadController[5, 2, 20];
         m_first.RoadSetUp(null, m_first.RoadNumber);
+        //foreach (var item in m_Roads)
+        //{
+        //    if (item != null)
+        //    {
+        //        Debug.Log(item.RoadNumber);
+        //    }
+        //}
     }
 
     void Update()
@@ -52,9 +60,15 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void GetRoads()
+    public void GetRoads(RoadController rc)
     {
-        //m_Roads = new RoadController[0,0,0];
+        string[] srn = rc.RoadNumber.Split(char.Parse("-"));
+        int[] irn = new int[srn.Length];
+        for (int i = 0; i < irn.Length; i++)
+        {
+            irn[i] = int.Parse(srn[i]);
+        }
+        m_Roads[irn[0], irn[1], irn[2]] = rc;
     }
 
     //エントリーパネルで使うメソッド

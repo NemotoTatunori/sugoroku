@@ -23,7 +23,8 @@ public class RoadController : MonoBehaviour
     [SerializeField] string m_eventText = null;
     /// <summary>位置補正のフラグ</summary>
     bool m_positionCorrection = false;
-    int m_branchNumber;
+    /// <summary>ゲームマネージャー</summary>
+    GameManager m_gameManager;
     /// <summary>前のマスの接続部のプロパティ</summary>
     public Transform[] PrevConnect
     {
@@ -57,15 +58,15 @@ public class RoadController : MonoBehaviour
     /// </summary>
     public virtual void RoadSetUp(RoadController road, string rn)
     {
+        m_gameManager = FindObjectOfType<GameManager>();
         if (RoadNumber == "")
         {
             RoadNumber = rn;
         }
 
         PrevRoadSet(road);
-
         //次のマスに情報を送る
-        if (m_nextRoads == null)
+        if (m_nextRoads.Length == 0)
         {
             return;
         }
@@ -76,6 +77,7 @@ public class RoadController : MonoBehaviour
             Vector3 a = m_nextRoads[0].gameObject.transform.position;
             m_nextRoads[0].PositionSetUp(a + (now - next));
         }
+        m_gameManager.GetRoads(this);
         m_nextRoads[0].RoadSetUp(this, NextNumber(RoadNumber,0));
     }
     /// <summary>
