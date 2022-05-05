@@ -46,13 +46,6 @@ public class GameManager : MonoBehaviour
     {
         m_Roads = new RoadController[5, 2, 20];
         m_first.RoadSetUp(null, m_first.RoadNumber);
-        //foreach (var item in m_Roads)
-        //{
-        //    if (item != null)
-        //    {
-        //        Debug.Log(item.RoadNumber);
-        //    }
-        //}
     }
 
     void Update()
@@ -98,7 +91,7 @@ public class GameManager : MonoBehaviour
             car.transform.position = new Vector3(px + x * 5, 0, z * -10);
             m_players[i] = car.GetComponent<PlayerController>();
             EntryNamePrefab en = m_entryNameDisplay.transform.GetChild(i).GetComponent<EntryNamePrefab>();
-            m_players[i].Set();
+            m_players[i].Seting(en.Name, m_first);
             m_players[i].AddHuman(en.Seibetu, en.Name);
             x++;
             if (x >= 10)

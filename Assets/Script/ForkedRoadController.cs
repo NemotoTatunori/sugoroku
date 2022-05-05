@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class ForkedRoadController : RoadController
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="road"></param>
-    /// <param name="rn"></param>
-    /// <param name="bn"></param>
+
     public override void RoadSetUp(RoadController road, string rn)
     {
         if (RoadNumber == "")
@@ -55,5 +50,10 @@ public class ForkedRoadController : RoadController
             }
         }
         return an;
+    }
+
+    public override RoadController NextRoad()
+    {
+        return base.NextRoad();
     }
 }

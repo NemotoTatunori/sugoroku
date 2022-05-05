@@ -687,7 +687,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_roadNumber: 
   m_roadNumberText: {fileID: 4812997104171259357}
-  m_stopPoint: {fileID: 0}
+  m_stopPoint: {fileID: 5613958311823076152}
   m_nextConnect:
   - {fileID: 4774492889881314127}
   m_prevConnect:
@@ -696,6 +696,7 @@ MonoBehaviour:
   m_nextRoads: []
   m_prevRoads: []
   m_eventText: 
+  m_stopFlag: 0
 --- !u!1 &5613958311400741452
 GameObject:
   m_ObjectHideFlags: 0

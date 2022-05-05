@@ -21,6 +21,8 @@ public class RoadController : MonoBehaviour
     [SerializeField] protected RoadController[] m_prevRoads = null;
     /// <summary>マスのテキスト</summary>
     [SerializeField] string m_eventText = null;
+    /// <summary>ストップマスのフラグ</summary>
+    [SerializeField] bool m_stopFlag = false;
     /// <summary>位置補正のフラグ</summary>
     bool m_positionCorrection = false;
     /// <summary>ゲームマネージャー</summary>
@@ -44,6 +46,21 @@ public class RoadController : MonoBehaviour
     public bool PositionCorrection
     {
         get => m_positionCorrection;
+    }
+    /// <summary>ストップマスのプロパティ</summary>
+    public bool StopFlag
+    {
+        get => m_stopFlag;
+    }
+    /// <summary>車が止まる場所のプロパティ</summary>
+    public Transform StopPint
+    {
+        get => m_stopPoint;
+    }
+    /// <summary>一つ前のマスのプロパティ</summary>
+    public RoadController PrevRoad
+    {
+        get => m_prevRoads[0];
     }
 
     void Start()
@@ -104,7 +121,6 @@ public class RoadController : MonoBehaviour
             m_prevRoads[i] = road;
         }
     }
-
     /// <summary>
     /// マス番号を設定する
     /// </summary>
@@ -129,7 +145,6 @@ public class RoadController : MonoBehaviour
         }
         return an;
     }
-
     /// <summary>
     /// マスの位置を調節する
     /// </summary>
@@ -138,9 +153,12 @@ public class RoadController : MonoBehaviour
         m_positionCorrection = true;
         this.transform.position = p;
     }
-
-    public RoadController[] Road()
+    /// <summary>
+    /// 次のマスを返す
+    /// </summary>
+    /// <returns>次のマス</returns>
+    public virtual RoadController NextRoad()
     {
-        return m_nextRoads;
+        return m_nextRoads[0];
     }
 }
