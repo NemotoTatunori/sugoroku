@@ -41,18 +41,29 @@ public class GameManager : MonoBehaviour
     RoadController[,,] m_Roads;
     /// <summary>手番を管理する</summary>
     [SerializeField] int m_order = 0;
-
+    /// <summary>ルーレット</summary>
+    [SerializeField] RouletteController m_roulette = null;
+    /// <summary>ルーレットのプロパティ</summary>
+    public RouletteController Roulette
+    {
+        get => m_roulette;
+    }
     void Start()
     {
         m_Roads = new RoadController[5, 2, 20];
         m_first.RoadSetUp(null, m_first.RoadNumber);
     }
-
     void Update()
     {
 
     }
 
+    
+
+    /// <summary>
+    /// マスの情報を取得する
+    /// </summary>
+    /// <param name="rc">マスの情報</param>
     public void GetRoads(RoadController rc)
     {
         string[] srn = rc.RoadNumber.Split(char.Parse("-"));
@@ -62,6 +73,31 @@ public class GameManager : MonoBehaviour
             irn[i] = int.Parse(srn[i]);
         }
         m_Roads[irn[0], irn[1], irn[2]] = rc;
+    }
+    /// <summary>
+    /// 手番を変える
+    /// </summary>
+    void TurnChange()
+    {
+        m_order++;
+        if (m_order >= m_players.Length)
+        {
+            m_order = 0;
+        }
+        m_coroutine = StartCoroutine(GameProgress());
+    }
+
+    /// <summary>
+    /// ゲームサイクル
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator GameProgress()
+    {
+        m_roulette.gameObject.SetActive(true);
+        yield return m_roulette.RouletteStart();
+        yield return m_players[m_order].MoveStart(m_roulette.Number, false);
+
+        TurnChange();
     }
 
     //エントリーパネルで使うメソッド
@@ -100,6 +136,11 @@ public class GameManager : MonoBehaviour
                 z++;
             }
         }
+        if (m_coroutine != null)
+        {
+            StopCoroutine(m_coroutine);
+        }
+        m_coroutine = StartCoroutine(GameProgress());
     }
     /// <summary>
     /// エントリーさせる

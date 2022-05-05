@@ -611,6 +611,7 @@ MonoBehaviour:
   m_nextRoads: []
   m_prevRoads: []
   m_eventText: 
+  m_stopFlag: 0
 --- !u!1 &5254121341972351631
 GameObject:
   m_ObjectHideFlags: 0

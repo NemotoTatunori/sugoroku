@@ -280,9 +280,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc4564da2a1594b439834252fab73010, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_name: 
+  m_ownerName: 
   m_money: 0
-  m_location: 
+  m_location: {fileID: 0}
   m_Seats:
   - {fileID: 4192577846530829763}
   - {fileID: 8863670870966486053}
@@ -293,6 +293,7 @@ MonoBehaviour:
   m_sittings: 
   m_family: []
   m_humanPrefab: {fileID: 1806464685458258244, guid: 468fda027fd50a1458d2cce93100ff89, type: 3}
+  m_moveSpeed: 30
 --- !u!1 &3032777190564943586
 GameObject:
   m_ObjectHideFlags: 0

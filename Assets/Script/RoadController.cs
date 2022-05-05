@@ -26,7 +26,7 @@ public class RoadController : MonoBehaviour
     /// <summary>位置補正のフラグ</summary>
     bool m_positionCorrection = false;
     /// <summary>ゲームマネージャー</summary>
-    GameManager m_gameManager;
+    protected GameManager m_gameManager;
     /// <summary>前のマスの接続部のプロパティ</summary>
     public Transform[] PrevConnect
     {
@@ -159,6 +159,10 @@ public class RoadController : MonoBehaviour
     /// <returns>次のマス</returns>
     public virtual RoadController NextRoad()
     {
+        if (m_nextRoads.Length == 0)
+        {
+            return null;
+        }
         return m_nextRoads[0];
     }
 }

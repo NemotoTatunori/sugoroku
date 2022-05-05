@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ForkedRoadController : RoadController
 {
-
     public override void RoadSetUp(RoadController road, string rn)
     {
         if (RoadNumber == "")
@@ -55,5 +54,13 @@ public class ForkedRoadController : RoadController
     public override RoadController NextRoad()
     {
         return base.NextRoad();
+    }
+
+    public Coroutine BranchRoulette()
+    {
+        RouletteController roulette = m_gameManager.Roulette;
+        int[] lineup = { 1, 2 };
+        roulette.GetLineup(lineup);
+        return roulette.RouletteStart();
     }
 }

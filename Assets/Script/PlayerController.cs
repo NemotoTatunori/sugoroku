@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     int m_familyNum = 0;
     /// <summary>人のプレハブ</summary>
     [SerializeField] GameObject m_humanPrefab = null;
-
+    /// <summary>動く速さ</summary>
     [SerializeField] float m_moveSpeed = 5;
 
     private void Start()
@@ -57,9 +57,9 @@ public class PlayerController : MonoBehaviour
         m_family[m_familyNum - 1].Seting(seibetu, name);
     }
 
-    public void MoveStart(bool reverse)
+    public Coroutine MoveStart(int m, bool reverse)
     {
-        StartCoroutine(Move(1, reverse));
+        return StartCoroutine(Move(m, reverse));
     }
 
     IEnumerator Move(int m, bool reverse)
@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 now = m_location.StopPint.position;
             RoadController nextPint;
-            
+
             if (!reverse)
             {
                 nextPint = m_location.NextRoad();
@@ -102,11 +102,18 @@ public class PlayerController : MonoBehaviour
                     f++;
                 }
                 transform.position = new Vector3(x, y, z);
-                Debug.Log(transform.position);
                 yield return null;
             }
             transform.position = next;
             m_location = nextPint;
+            if (m_location.NextRoad() == null)
+            {
+                reverse = true;
+            }
+            if (m_location.StopFlag)
+            {
+                break;
+            }
             yield return null;
         }
     }
