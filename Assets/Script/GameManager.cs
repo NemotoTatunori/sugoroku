@@ -31,6 +31,12 @@ public class GameManager : MonoBehaviour
 
 
     //ゲームで使う変数
+    /// <summary>職業一覧</summary>
+    string[] m_professions = { "スポーツ選手", "プログラマー", "パティシエ", "料理人", "大工" };
+    /// <summary>給料一覧</summary>
+    int[,] m_salarys = {
+        { 10000, 11000, 12000, 13000, 14000 },
+        { 30000, 29000, 28000, 27000, 26000 } };
     /// <summary>最初のマス</summary>
     [SerializeField] RoadController m_first = null;
     /// <summary>車のプレハブ</summary>
@@ -48,6 +54,7 @@ public class GameManager : MonoBehaviour
     {
         get => m_roulette;
     }
+
     void Start()
     {
         m_Roads = new RoadController[5, 2, 20];
@@ -57,8 +64,6 @@ public class GameManager : MonoBehaviour
     {
 
     }
-
-    
 
     /// <summary>
     /// マスの情報を取得する
@@ -86,6 +91,16 @@ public class GameManager : MonoBehaviour
         }
         m_coroutine = StartCoroutine(GameProgress());
     }
+    /// <summary>
+    /// 給料を返す
+    /// </summary>
+    /// <param name="profession">職業</param>
+    /// <param name="salaryRank">ランク</param>
+    /// <returns>給料</returns>
+    public int Salary(int profession, int salaryRank)
+    {
+        return m_salarys[profession, salaryRank];
+    }
 
     /// <summary>
     /// ゲームサイクル
@@ -93,10 +108,29 @@ public class GameManager : MonoBehaviour
     /// <returns></returns>
     IEnumerator GameProgress()
     {
-        m_roulette.gameObject.SetActive(true);
-        yield return m_roulette.RouletteStart();
-        yield return m_players[m_order].MoveStart(m_roulette.Number, false);
+        PlayerController p = m_players[m_order];
+        if (!p.Rest)
+        {
+            //ルーレットを表示
+            m_roulette.gameObject.SetActive(true);
 
+            //ルーレットを動かす
+            yield return m_roulette.RouletteStart();
+
+            //出た数値を車に送る
+            yield return p.MoveStart(m_roulette.Number, false);
+
+            //止まったマスのイベントを呼ぶ
+            yield return p.Location.RoadEvent(m_players[m_order]);
+        }
+        else
+        {
+            p.Rest = false;
+        }
+        if (p.PaydayFlag)
+        {
+            p.GetMoney(Salary(p.Profession,p.SalaryRank));
+        }
         TurnChange();
     }
 

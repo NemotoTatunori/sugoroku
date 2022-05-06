@@ -289,6 +289,8 @@ MonoBehaviour:
   m_prevRoads: []
   m_eventText: 
   m_stopFlag: 0
+  m_event: 3
+  m_eventParameter: 1000
 --- !u!1 &1896841001067789105
 GameObject:
   m_ObjectHideFlags: 0

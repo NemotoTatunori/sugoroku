@@ -51,9 +51,9 @@ public class ForkedRoadController : RoadController
         return an;
     }
 
-    public override RoadController NextRoad()
+    public override IEnumerator RoadEvent(PlayerController player)
     {
-        return base.NextRoad();
+        yield return null;
     }
 
     public Coroutine BranchRoulette()

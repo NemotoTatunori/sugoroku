@@ -5,6 +5,24 @@ using UnityEngine.UI;
 
 public class RoadController : MonoBehaviour
 {
+    /// <summary>イベントの種類</summary>
+    enum RoadEvents
+    {
+        /// <summary>進む</summary>
+        Go = 0,
+        /// <summary>戻る</summary>
+        Return = 1,
+        /// <summary>休み</summary>
+        Rest = 2,
+        /// <summary>お金をもらう</summary>
+        GetMoney = 3,
+        /// <summary>お金を払う</summary>
+        PayMoney = 4,
+        /// <summary>就職</summary>
+        FindWork = 5,
+        /// <summary>給料日</summary>
+        Payday = 6,
+    }
     /// <summary>マス番号</summary>
     [SerializeField] string m_roadNumber;
     /// <summary>マス番号表示</summary>
@@ -23,6 +41,10 @@ public class RoadController : MonoBehaviour
     [SerializeField] string m_eventText = null;
     /// <summary>ストップマスのフラグ</summary>
     [SerializeField] bool m_stopFlag = false;
+    /// <summary>イベントのステート</summary>
+    [SerializeField] RoadEvents m_event = RoadEvents.GetMoney;
+    /// <summary>イベントのパラメーター</summary>
+    [SerializeField] int m_eventParameter = 1000;
     /// <summary>位置補正のフラグ</summary>
     bool m_positionCorrection = false;
     /// <summary>ゲームマネージャー</summary>
@@ -164,5 +186,37 @@ public class RoadController : MonoBehaviour
             return null;
         }
         return m_nextRoads[0];
+    }
+    /// <summary>
+    /// マスのイベント
+    /// </summary>
+    /// <returns></returns>
+    public virtual IEnumerator RoadEvent(PlayerController player)
+    {
+        switch(m_event)
+        {
+            case RoadEvents.Go:
+                yield return player.MoveStart(m_eventParameter, false);
+                break;
+            case RoadEvents.Return:
+                yield return player.MoveStart(m_eventParameter, true);
+                break;
+            case RoadEvents.Rest:
+                player.Rest = true;
+                break;
+            case RoadEvents.GetMoney:
+                player.GetMoney(m_eventParameter);
+                break;
+            case RoadEvents.PayMoney:
+                player.GetMoney(m_eventParameter * -1);
+                break;
+            case RoadEvents.FindWork:
+                player.Profession = m_eventParameter;
+                break;
+            case RoadEvents.Payday:
+                player.GetMoney(m_gameManager.Salary(player.Profession, player.SalaryRank));
+                break;
+        }
+        yield return null;
     }
 }
