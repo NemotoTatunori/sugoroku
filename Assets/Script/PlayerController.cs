@@ -30,10 +30,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject m_humanPrefab = null;
     /// <summary>動く速さ</summary>
     [SerializeField] float m_moveSpeed = 30;
+    /// <summary>分岐道の行先</summary>
+    int m_branchNumber = 0;
     /// <summary>現在位置のプロパティ</summary>
     public RoadController Location
     {
         get => m_location;
+        set
+        {
+            m_location = value;
+        }
     }
     /// <summary>職業のプロパティ</summary>
     public int Profession
@@ -69,6 +75,15 @@ public class PlayerController : MonoBehaviour
         set
         {
             m_rest = value;
+        }
+    }
+    /// <summary>分岐道の行先のフラグのプロパティ</summary>
+    public int BranchNumber
+    {
+        get => m_branchNumber;
+        set
+        {
+            m_branchNumber = value;
         }
     }
     /// <summary>
@@ -133,7 +148,7 @@ public class PlayerController : MonoBehaviour
             RoadController nextPint;
             if (!reverse)
             {
-                nextPint = m_location.NextRoad();
+                nextPint = m_location.NextRoad(m_branchNumber);
             }
             else
             {
@@ -167,7 +182,7 @@ public class PlayerController : MonoBehaviour
             }
             transform.position = next;
             m_location = nextPint;
-            if (m_location.NextRoad() == null)
+            if (m_location.NextRoad(m_branchNumber) == null)
             {
                 reverse = true;
             }

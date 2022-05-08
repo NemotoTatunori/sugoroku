@@ -38,7 +38,7 @@ public class RoadController : MonoBehaviour
     /// <summary>前のマス</summary>
     [SerializeField] protected RoadController[] m_prevRoads = null;
     /// <summary>マスのテキスト</summary>
-    [SerializeField] string m_eventText = null;
+    [SerializeField] Text m_eventText = null;
     /// <summary>ストップマスのフラグ</summary>
     [SerializeField] bool m_stopFlag = false;
     /// <summary>イベントのステート</summary>
@@ -95,14 +95,13 @@ public class RoadController : MonoBehaviour
     /// <summary>
     /// マス情報を設定する
     /// </summary>
-    public virtual void RoadSetUp(RoadController road, string rn)
+    public virtual void RoadSetUp(RoadController road, string rn, GameManager gameManager)
     {
-        m_gameManager = FindObjectOfType<GameManager>();
+        m_gameManager = gameManager;
         if (RoadNumber == "")
         {
             RoadNumber = rn;
         }
-
         PrevRoadSet(road);
         //次のマスに情報を送る
         if (m_nextRoads.Length == 0)
@@ -117,7 +116,7 @@ public class RoadController : MonoBehaviour
             m_nextRoads[0].PositionSetUp(a + (now - next));
         }
         m_gameManager.GetRoads(this);
-        m_nextRoads[0].RoadSetUp(this, NextNumber(RoadNumber,0));
+        m_nextRoads[0].RoadSetUp(this, NextNumber(RoadNumber, 0), gameManager);
     }
     /// <summary>
     /// 一つ前のマスを登録する
@@ -179,7 +178,7 @@ public class RoadController : MonoBehaviour
     /// 次のマスを返す
     /// </summary>
     /// <returns>次のマス</returns>
-    public virtual RoadController NextRoad()
+    public virtual RoadController NextRoad(int branch)
     {
         if (m_nextRoads.Length == 0)
         {
@@ -193,7 +192,7 @@ public class RoadController : MonoBehaviour
     /// <returns></returns>
     public virtual IEnumerator RoadEvent(PlayerController player)
     {
-        switch(m_event)
+        switch (m_event)
         {
             case RoadEvents.Go:
                 yield return player.MoveStart(m_eventParameter, false);
@@ -218,5 +217,26 @@ public class RoadController : MonoBehaviour
                 break;
         }
         yield return null;
+    }
+    /// <summary>
+    /// マスのイベントテキストを返す
+    /// </summary>
+    /// <returns>イベントテキスト</returns>
+    public string EventText()
+    {
+        string BText = m_eventText.text;
+        string AText = "";
+        foreach (var item in BText)
+        {
+            if (item == char.Parse("#"))
+            {
+                AText += m_eventParameter;
+            }
+            else
+            {
+                AText += item;
+            }
+        }
+        return AText;
     }
 }

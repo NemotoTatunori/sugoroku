@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class ForkedRoadController : RoadController
 {
-    public override void RoadSetUp(RoadController road, string rn)
+    public override void RoadSetUp(RoadController road, string rn, GameManager gameManager)
     {
+        m_gameManager = gameManager;
         if (RoadNumber == "")
         {
             RoadNumber = rn;
@@ -25,7 +26,7 @@ public class ForkedRoadController : RoadController
                 Vector3 a = m_nextRoads[i].gameObject.transform.position;
                 m_nextRoads[i].PositionSetUp(a + (now - next));
             }
-            m_nextRoads[i].RoadSetUp(this, NextNumber(rn, i));
+            m_nextRoads[i].RoadSetUp(this, NextNumber(rn, i), gameManager);
         }
     }
 
@@ -51,16 +52,18 @@ public class ForkedRoadController : RoadController
         return an;
     }
 
-    public override IEnumerator RoadEvent(PlayerController player)
+    public override RoadController NextRoad(int branch)
     {
-        yield return null;
+        return m_nextRoads[branch];
     }
 
-    public Coroutine BranchRoulette()
+    public override IEnumerator RoadEvent(PlayerController player)
     {
         RouletteController roulette = m_gameManager.Roulette;
-        int[] lineup = { 1, 2 };
+        roulette.gameObject.SetActive(true);
+        int[] lineup = { 0, 1 };
         roulette.GetLineup(lineup);
-        return roulette.RouletteStart();
+        yield return roulette.RouletteStart();
+        player.BranchNumber = roulette.Number;
     }
 }

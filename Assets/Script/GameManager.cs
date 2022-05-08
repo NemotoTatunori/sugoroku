@@ -49,6 +49,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] int m_order = 0;
     /// <summary>ルーレット</summary>
     [SerializeField] RouletteController m_roulette = null;
+    /// <summary>ルーレットのデフォルト数</summary>
+    int[] m_rouletteLineupDefault = { 1, 2, 3, 4, 5 };
+    /// <summary>マスのテキストを表示するテキスト</summary>
+    [SerializeField] Text m_roadText = null;
     /// <summary>ルーレットのプロパティ</summary>
     public RouletteController Roulette
     {
@@ -58,7 +62,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         m_Roads = new RoadController[5, 2, 20];
-        m_first.RoadSetUp(null, m_first.RoadNumber);
+        m_first.RoadSetUp(null, m_first.RoadNumber, this);
     }
     void Update()
     {
@@ -89,6 +93,7 @@ public class GameManager : MonoBehaviour
         {
             m_order = 0;
         }
+        m_roulette.GetLineup(m_rouletteLineupDefault);
         m_coroutine = StartCoroutine(GameProgress());
     }
     /// <summary>
@@ -120,6 +125,20 @@ public class GameManager : MonoBehaviour
             //出た数値を車に送る
             yield return p.MoveStart(m_roulette.Number, false);
 
+            //マスのテキストを表示する
+            m_roadText.transform.parent.gameObject.SetActive(true);
+            m_roadText.text = p.Location.EventText();
+
+            while (true)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    m_roadText.transform.parent.gameObject.SetActive(false);
+                    break;
+                }
+                yield return null;
+            }
+
             //止まったマスのイベントを呼ぶ
             yield return p.Location.RoadEvent(m_players[m_order]);
         }
@@ -129,7 +148,7 @@ public class GameManager : MonoBehaviour
         }
         if (p.PaydayFlag)
         {
-            p.GetMoney(Salary(p.Profession,p.SalaryRank));
+            p.GetMoney(Salary(p.Profession, p.SalaryRank));
         }
         TurnChange();
     }
