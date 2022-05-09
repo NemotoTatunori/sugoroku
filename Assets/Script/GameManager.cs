@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour
     int[,] m_salarys = {
         { 10000, 11000, 12000, 13000, 14000 },
         { 30000, 29000, 28000, 27000, 26000 } };
+    /// <summary>カメラ</summary>
+    [SerializeField] GameObject m_camera = null;
     /// <summary>最初のマス</summary>
     [SerializeField] RoadController m_first = null;
     /// <summary>車のプレハブ</summary>
@@ -53,6 +55,11 @@ public class GameManager : MonoBehaviour
     int[] m_rouletteLineupDefault = { 1, 2, 3, 4, 5 };
     /// <summary>マスのテキストを表示するテキスト</summary>
     [SerializeField] Text m_roadText = null;
+
+    [SerializeField] Text m_playerStatusNameBoxText = null;
+    [SerializeField] Text m_playerStatusMoneyBoxText = null;
+    [SerializeField] Text m_playerStatusProfessionBoxText = null;
+    [SerializeField] Text m_playerStatusSalaryRankBoxText = null;
     /// <summary>ルーレットのプロパティ</summary>
     public RouletteController Roulette
     {
@@ -88,13 +95,38 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void TurnChange()
     {
-        m_order++;
-        if (m_order >= m_players.Length)
+        bool ag = true;
+        foreach (var item in m_players)
         {
-            m_order = 0;
+            if (!item.Goal)
+            {
+                ag = false;
+                break;
+            }
         }
-        m_roulette.GetLineup(m_rouletteLineupDefault);
-        m_coroutine = StartCoroutine(GameProgress());
+        if (!ag)
+        {
+            m_order++;
+            if (m_order >= m_players.Length)
+            {
+                m_order = 0;
+            }
+            if (m_players[m_order].Goal)
+            {
+                TurnChange();
+            }
+            else
+            {
+                m_roulette.GetLineup(m_rouletteLineupDefault);
+                PlayerStatusBoxUpdata();
+                m_coroutine = StartCoroutine(GameProgress());
+            }
+        }
+        else
+        {
+            Debug.Log("全員ゴールした");
+            //全員ゴールした時の処理を書く
+        }
     }
     /// <summary>
     /// 給料を返す
@@ -105,6 +137,17 @@ public class GameManager : MonoBehaviour
     public int Salary(int profession, int salaryRank)
     {
         return m_salarys[profession, salaryRank];
+    }
+    /// <summary>
+    /// プレイヤーステータスボックスを更新する
+    /// </summary>
+    public void PlayerStatusBoxUpdata()
+    {
+        PlayerController p = m_players[m_order];
+        m_playerStatusNameBoxText.text = p.OwnerName;
+        m_playerStatusMoneyBoxText.text = p.Money.ToString();
+        m_playerStatusProfessionBoxText.text = m_professions[p.Profession];
+        m_playerStatusSalaryRankBoxText.text = p.SalaryRank.ToString();
     }
 
     /// <summary>
@@ -193,6 +236,7 @@ public class GameManager : MonoBehaviour
         {
             StopCoroutine(m_coroutine);
         }
+        PlayerStatusBoxUpdata();
         m_coroutine = StartCoroutine(GameProgress());
     }
     /// <summary>

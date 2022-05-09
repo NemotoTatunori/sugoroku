@@ -32,6 +32,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float m_moveSpeed = 30;
     /// <summary>分岐道の行先</summary>
     int m_branchNumber = 0;
+    /// <summary>ゴールのフラグ</summary>
+    bool m_goal;
+    /// <summary>名前のプロパティ</summary>
+    public string OwnerName
+    {
+        get => m_ownerName;
+    }
+    /// <summary>所持金のプロパティ</summary>
+    public int Money
+    {
+        get => m_money;
+    }
     /// <summary>現在位置のプロパティ</summary>
     public RoadController Location
     {
@@ -84,6 +96,15 @@ public class PlayerController : MonoBehaviour
         set
         {
             m_branchNumber = value;
+        }
+    }
+    /// <summary>ゴールのフラグのプロパティ</summary>
+    public bool Goal
+    {
+        get => m_goal;
+        set
+        {
+            m_goal = value;
         }
     }
     /// <summary>

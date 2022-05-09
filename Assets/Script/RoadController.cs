@@ -22,6 +22,8 @@ public class RoadController : MonoBehaviour
         FindWork = 5,
         /// <summary>‹‹—¿“ú</summary>
         Payday = 6,
+        /// <summary>ƒS[ƒ‹</summary>
+        Goal = 7,
     }
     /// <summary>ƒ}ƒX”Ô†</summary>
     [SerializeField] string m_roadNumber;
@@ -214,6 +216,9 @@ public class RoadController : MonoBehaviour
                 break;
             case RoadEvents.Payday:
                 player.GetMoney(m_gameManager.Salary(player.Profession, player.SalaryRank));
+                break;
+            case RoadEvents.Goal:
+                player.Goal = true;
                 break;
         }
         yield return null;
