@@ -43,13 +43,17 @@ public class CameraController : MonoBehaviour
             velo.y = m_rb.velocity.y;
             m_rb.velocity = velo;
         }
+        else
+        {
+            m_rb.velocity = Vector3.zero;
+        }
     }
 
     public void PositionSet(Vector3 p)
     {
         float x = p.x;
         float z = p.z;
-        transform.position = new Vector3(x + 10, 10, z);
+        transform.position = new Vector3(x + 20, 10, z);
         transform.rotation = Quaternion.Euler(30, -90, 0);
     }
 }

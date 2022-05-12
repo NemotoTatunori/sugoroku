@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -30,6 +31,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject m_humanPrefab = null;
     /// <summary>動く速さ</summary>
     [SerializeField] float m_moveSpeed = 30;
+    /// <summary>名前を表示する場所</summary>
+    [SerializeField] Image m_nameTextImage = null;
+    /// <summary>名前を表示するテキスト</summary>
+    [SerializeField] Text m_nameText = null;
     /// <summary>分岐道の行先</summary>
     int m_branchNumber = 0;
     /// <summary>ゴールのフラグ</summary>
@@ -107,6 +112,12 @@ public class PlayerController : MonoBehaviour
             m_goal = value;
         }
     }
+
+    void Update()
+    {
+        m_nameTextImage.transform.rotation = Camera.main.transform.rotation;
+    }
+
     /// <summary>
     /// 所持金を変動させる
     /// </summary>
@@ -130,6 +141,7 @@ public class PlayerController : MonoBehaviour
         }
         m_sittings[0] = true;
         m_ownerName = name;
+        m_nameText.text = m_ownerName;
         m_location = location;
     }
     /// <summary>
