@@ -13,6 +13,8 @@ public class RouletteController : MonoBehaviour
     [SerializeField] GameObject m_StopButton = null;
     /// <summary>数字が切り替わる時間</summary>
     [SerializeField] float m_speed = 0.1f;
+    /// <summary>数字を隠す蓋</summary>
+    [SerializeField] GameObject m_lid = null;
     /// <summary>選ばれる数字の配列</summary>
     int[] m_lineup = { 1, 2, 3, 4, 5 };//, 6, 7, 8, 9, 10
     /// <summary>ルーレット始動のフラグ</summary>
@@ -60,6 +62,7 @@ public class RouletteController : MonoBehaviour
     /// <returns></returns>
     IEnumerator Roulette()
     {
+        m_lid.SetActive(true);
         int n = 0;
         float interval = 0;
         while (true)
@@ -80,6 +83,7 @@ public class RouletteController : MonoBehaviour
         }
         m_numberDisplay.text = m_lineup[n].ToString();
         m_number = m_lineup[n];
+        m_lid.SetActive(false);
         yield return new WaitForSeconds(1f);
         m_StartButton.SetActive(true);
         this.gameObject.SetActive(false);

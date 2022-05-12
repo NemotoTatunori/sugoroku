@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class RoadController : MonoBehaviour
 {
     /// <summary>イベントの種類</summary>
-    enum RoadEvents
+    public enum RoadEvents
     {
         /// <summary>進む</summary>
         Go = 0,
@@ -85,6 +85,11 @@ public class RoadController : MonoBehaviour
     public RoadController PrevRoad
     {
         get => m_prevRoads[0];
+    }
+    /// <summary>イベントのプロパティ</summary>
+    public RoadEvents Event
+    {
+        get => m_event;
     }
 
     void Start()
@@ -197,10 +202,10 @@ public class RoadController : MonoBehaviour
         switch (m_event)
         {
             case RoadEvents.Go:
-                yield return player.MoveStart(m_eventParameter, false);
+                yield return player.MoveStart(m_eventParameter, false, true);
                 break;
             case RoadEvents.Return:
-                yield return player.MoveStart(m_eventParameter, true);
+                yield return player.MoveStart(m_eventParameter, true, true);
                 break;
             case RoadEvents.Rest:
                 player.Rest = true;
@@ -216,6 +221,7 @@ public class RoadController : MonoBehaviour
                 break;
             case RoadEvents.Payday:
                 player.GetMoney(m_gameManager.Salary(player.Profession, player.SalaryRank));
+                player.PaydayFlag = false;
                 break;
             case RoadEvents.Goal:
                 player.Goal = true;

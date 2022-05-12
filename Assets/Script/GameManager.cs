@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     /// <summary>最大人数</summary>
     int m_maxEntry = 30;
     Coroutine m_coroutine;
+    [SerializeField] Image m_fadePanel = null;
 
     //エントリーパネルで使う変数
     /// <summary>参加する人の名前を入力する場所</summary>
@@ -38,7 +39,7 @@ public class GameManager : MonoBehaviour
         { 10000, 11000, 12000, 13000, 14000 },
         { 30000, 29000, 28000, 27000, 26000 } };
     /// <summary>カメラ</summary>
-    [SerializeField] GameObject m_camera = null;
+    [SerializeField] CameraController m_camera = null;
     /// <summary>最初のマス</summary>
     [SerializeField] RoadController m_first = null;
     /// <summary>車のプレハブ</summary>
@@ -53,12 +54,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] RouletteController m_roulette = null;
     /// <summary>ルーレットのデフォルト数</summary>
     int[] m_rouletteLineupDefault = { 1, 2, 3, 4, 5 };
-    /// <summary>マスのテキストを表示するテキスト</summary>
+    /// <summary>テキストを表示する</summary>
     [SerializeField] Text m_roadText = null;
-
+    /// <summary>名前を表示する</summary>
     [SerializeField] Text m_playerStatusNameBoxText = null;
+    /// <summary>所持金を表示する</summary>
     [SerializeField] Text m_playerStatusMoneyBoxText = null;
+    /// <summary>職業を表示する</summary>
     [SerializeField] Text m_playerStatusProfessionBoxText = null;
+    /// <summary>給料ランクを表示する</summary>
     [SerializeField] Text m_playerStatusSalaryRankBoxText = null;
     /// <summary>ルーレットのプロパティ</summary>
     public RouletteController Roulette
@@ -149,6 +153,15 @@ public class GameManager : MonoBehaviour
         m_playerStatusProfessionBoxText.text = m_professions[p.Profession];
         m_playerStatusSalaryRankBoxText.text = p.SalaryRank.ToString();
     }
+    /// <summary>
+    /// 表示するテキストを更新して表示する
+    /// </summary>
+    /// <param name="t"></param>
+    public void TextDisplay(string t)
+    {
+        m_roadText.transform.parent.gameObject.SetActive(true);
+        m_roadText.text = t;
+    }
 
     /// <summary>
     /// ゲームサイクル
@@ -157,8 +170,23 @@ public class GameManager : MonoBehaviour
     IEnumerator GameProgress()
     {
         PlayerController p = m_players[m_order];
+        p.transform.position = p.Location.StopPint.position;
+        m_camera.PositionSet(p.transform.position);
+        yield return Fade(true);
+
         if (!p.Rest)
         {
+            TextDisplay(p.OwnerName + "さんの番です");
+            while (true)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    m_roadText.transform.parent.gameObject.SetActive(false);
+                    m_camera.Move = true;
+                    break;
+                }
+                yield return null;
+            }
             //ルーレットを表示
             m_roulette.gameObject.SetActive(true);
 
@@ -166,14 +194,14 @@ public class GameManager : MonoBehaviour
             yield return m_roulette.RouletteStart();
 
             //出た数値を車に送る
-            yield return p.MoveStart(m_roulette.Number, false);
+            yield return p.MoveStart(m_roulette.Number, false, false);
 
             //マスのテキストを表示する
-            m_roadText.transform.parent.gameObject.SetActive(true);
-            m_roadText.text = p.Location.EventText();
+            TextDisplay(p.Location.EventText());
 
             while (true)
             {
+                //クリック入力があるまで待つ
                 if (Input.GetMouseButtonDown(0))
                 {
                     m_roadText.transform.parent.gameObject.SetActive(false);
@@ -187,15 +215,66 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            TextDisplay(p.OwnerName + "さんはお休みのようです");
+            while (true)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    m_roadText.transform.parent.gameObject.SetActive(false);
+                    break;
+                }
+                yield return null;
+            }
             p.Rest = false;
         }
         if (p.PaydayFlag)
         {
             p.GetMoney(Salary(p.Profession, p.SalaryRank));
         }
+        yield return Fade(false);
+        m_camera.Move = false;
         TurnChange();
     }
-
+    /// <summary>
+    /// フェードを制御する
+    /// </summary>
+    /// <param name="inOut"></param>
+    /// <returns></returns>
+    IEnumerator Fade(bool inOut)
+    {
+        m_fadePanel.gameObject.SetActive(true);
+        float c;
+        float a = m_fadePanel.color.a;
+        if (inOut)
+        {
+            c = 0;
+            while (c < a)
+            {
+                a -= Time.deltaTime;
+                m_fadePanel.color = new Color(0, 0, 0, a);
+                yield return null;
+            }
+            m_fadePanel.color = new Color(0, 0, 0, 0);
+        }
+        else
+        {
+            c = 1;
+            while (c > a)
+            {
+                a += Time.deltaTime;
+                m_fadePanel.color = new Color(0, 0, 0, a);
+                yield return null;
+            }
+            m_fadePanel.color = new Color(0, 0, 0, 1);
+        }
+        m_fadePanel.gameObject.SetActive(false);
+    }
+    IEnumerator Frist()
+    {
+        yield return Fade(false);
+        m_entryPanel.SetActive(false);
+        m_coroutine = StartCoroutine(GameProgress());
+    }
     //エントリーパネルで使うメソッド
     /// <summary>
     /// ゲームをスタートさせる
@@ -211,7 +290,6 @@ public class GameManager : MonoBehaviour
             m_coroutine = StartCoroutine(Caveat("１人もいないよ！"));
             return;
         }
-        m_entryPanel.SetActive(false);
         m_players = new PlayerController[m_peopleNum];
         float px = (m_peopleNum - 1) * -2.5f;
         if (m_peopleNum >= 11) { px = 9 * -2.5f; }
@@ -237,7 +315,7 @@ public class GameManager : MonoBehaviour
             StopCoroutine(m_coroutine);
         }
         PlayerStatusBoxUpdata();
-        m_coroutine = StartCoroutine(GameProgress());
+        StartCoroutine(Frist());
     }
     /// <summary>
     /// エントリーさせる

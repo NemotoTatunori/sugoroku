@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>給料日のフラグ</summary>
     bool m_paydayFlag = false;
     /// <summary>一回休みのフラグ</summary>
-    bool m_rest = false;
+    [SerializeField] bool m_rest = false;
     /// <summary>人のプレハブ</summary>
     [SerializeField] GameObject m_humanPrefab = null;
     /// <summary>動く速さ</summary>
@@ -150,9 +150,9 @@ public class PlayerController : MonoBehaviour
     /// <param name="m">進む数</param>
     /// <param name="reverse">進む方向</param>
     /// <returns></returns>
-    public Coroutine MoveStart(int m, bool reverse)
+    public Coroutine MoveStart(int m, bool reverse, bool e)
     {
-        return StartCoroutine(Move(m, reverse));
+        return StartCoroutine(Move(m, reverse, e));
     }
     /// <summary>
     /// 移動するコルーチン
@@ -160,7 +160,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="m">進む数</param>
     /// <param name="reverse">進む方向</param>
     /// <returns></returns>
-    IEnumerator Move(int m, bool reverse)
+    IEnumerator Move(int m, bool reverse, bool e)
     {
         yield return null;
         for (int i = 0; i < m; i++)
@@ -207,7 +207,11 @@ public class PlayerController : MonoBehaviour
             {
                 reverse = true;
             }
-            if (m_location.StopFlag)
+            if (m_location.Event == RoadController.RoadEvents.Payday && !e)
+            {
+                PaydayFlag = true;
+            }
+            if (m_location.StopFlag && !e)
             {
                 break;
             }
