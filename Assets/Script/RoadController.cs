@@ -2,33 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+/// <summary>イベントの種類</summary>
+public enum RoadEvents
+{
+    /// <summary>進む</summary>
+    Go = 0,
+    /// <summary>戻る</summary>
+    Return = 1,
+    /// <summary>休み</summary>
+    Rest = 2,
+    /// <summary>お金をもらう</summary>
+    GetMoney = 3,
+    /// <summary>お金を払う</summary>
+    PayMoney = 4,
+    /// <summary>就職</summary>
+    FindWork = 5,
+    /// <summary>給料日</summary>
+    Payday = 6,
+    /// <summary>結婚</summary>
+    Marriage = 7,
+    /// <summary>出産</summary>
+    Childbirth = 8,
+    /// <summary>分岐</summary>
+    RoadBranch = 9,
+    /// <summary>ゴール</summary>
+    Goal = 10,
+}
 public class RoadController : MonoBehaviour
 {
-    /// <summary>イベントの種類</summary>
-    public enum RoadEvents
-    {
-        /// <summary>進む</summary>
-        Go = 0,
-        /// <summary>戻る</summary>
-        Return = 1,
-        /// <summary>休み</summary>
-        Rest = 2,
-        /// <summary>お金をもらう</summary>
-        GetMoney = 3,
-        /// <summary>お金を払う</summary>
-        PayMoney = 4,
-        /// <summary>就職</summary>
-        FindWork = 5,
-        /// <summary>給料日</summary>
-        Payday = 6,
-        /// <summary>結婚</summary>
-        Marriage = 7,
-        /// <summary>出産</summary>
-        Childbirth = 8,
-        /// <summary>ゴール</summary>
-        Goal = 10,
-    }
+
     /// <summary>マス番号</summary>
     [SerializeField] string m_roadNumber;
     /// <summary>マス番号表示</summary>
@@ -94,6 +96,11 @@ public class RoadController : MonoBehaviour
     public RoadEvents Event
     {
         get => m_event;
+    }
+
+    public int EventParameter
+    {
+        get => m_eventParameter;
     }
 
     void Start()
@@ -197,48 +204,7 @@ public class RoadController : MonoBehaviour
         }
         return m_nextRoads[0];
     }
-    /// <summary>
-    /// マスのイベント
-    /// </summary>
-    /// <returns></returns>
-    public virtual IEnumerator RoadEvent(PlayerController player)
-    {
-        switch (m_event)
-        {
-            case RoadEvents.Go:
-                yield return player.MoveStart(m_eventParameter, false, true);
-                break;
-            case RoadEvents.Return:
-                yield return player.MoveStart(m_eventParameter, true, true);
-                break;
-            case RoadEvents.Rest:
-                player.Rest = true;
-                break;
-            case RoadEvents.GetMoney:
-                player.GetMoney(m_eventParameter);
-                break;
-            case RoadEvents.PayMoney:
-                player.GetMoney(m_eventParameter * -1);
-                break;
-            case RoadEvents.FindWork:
-                player.Profession = m_eventParameter;
-                break;
-            case RoadEvents.Payday:
-                player.GetMoney(m_gameManager.Salary(player.Profession, player.SalaryRank));
-                player.PaydayFlag = false;
-                break;
-            case RoadEvents.Marriage:
-                
-                break;
-            case RoadEvents.Childbirth:
-                
-                break;
-            case RoadEvents.Goal:
-                player.Goal = true;
-                break;
-        }
-        yield return null;
-    }
+
     /// <summary>
     /// マスのイベントテキストを返す
     /// </summary>
@@ -260,4 +226,6 @@ public class RoadController : MonoBehaviour
         }
         return AText;
     }
+
+    
 }

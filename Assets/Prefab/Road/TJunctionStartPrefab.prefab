@@ -724,7 +724,7 @@ MonoBehaviour:
   m_prevRoads: []
   m_eventText: {fileID: 3352789435421866994}
   m_stopFlag: 1
-  m_event: 3
+  m_event: 9
   m_eventParameter: 1000
 --- !u!1 &5613958311400741452
 GameObject:

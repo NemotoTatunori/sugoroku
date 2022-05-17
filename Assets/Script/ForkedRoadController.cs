@@ -57,13 +57,5 @@ public class ForkedRoadController : RoadController
         return m_nextRoads[branch];
     }
 
-    public override IEnumerator RoadEvent(PlayerController player)
-    {
-        RouletteController roulette = m_gameManager.Roulette;
-        roulette.gameObject.SetActive(true);
-        int[] lineup = { 0, 1 };
-        roulette.GetLineup(lineup);
-        yield return roulette.RouletteStart();
-        player.BranchNumber = roulette.Number;
-    }
+    
 }

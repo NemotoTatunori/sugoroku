@@ -218,7 +218,7 @@ public class PlayerController : MonoBehaviour
             {
                 reverse = true;
             }
-            if (m_location.Event == RoadController.RoadEvents.Payday && !e)
+            if (m_location.Event == RoadEvents.Payday && !e)
             {
                 PaydayFlag = true;
             }

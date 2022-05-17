@@ -64,11 +64,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text m_playerStatusProfessionBoxText = null;
     /// <summary>給料ランクを表示する</summary>
     [SerializeField] Text m_playerStatusSalaryRankBoxText = null;
-    /// <summary>ルーレットのプロパティ</summary>
-    public RouletteController Roulette
-    {
-        get => m_roulette;
-    }
+    /// <summary>子供を追加するパネル</summary>
+    [SerializeField] GameObject m_addHumanPanel = null;
+    /// <summary>子供の名前を取得するテキスト</summary>
+    [SerializeField] Text m_childNameText = null;
 
     void Start()
     {
@@ -212,7 +211,7 @@ public class GameManager : MonoBehaviour
             }
 
             //止まったマスのイベントを呼ぶ
-            yield return p.Location.RoadEvent(m_players[m_order]);
+            yield return RoadEvent(p, p.Location);
         }
         else
         {
@@ -235,6 +234,60 @@ public class GameManager : MonoBehaviour
         yield return Fade(false);
         m_camera.Move = false;
         TurnChange();
+    }
+
+    /// <summary>
+    /// マスのイベント
+    /// </summary>
+    /// <returns></returns>
+    public virtual IEnumerator RoadEvent(PlayerController player,RoadController road)
+    {
+        switch (road.Event)
+        {
+            case RoadEvents.Go:
+                yield return player.MoveStart(road.EventParameter, false, true);
+                break;
+            case RoadEvents.Return:
+                yield return player.MoveStart(road.EventParameter, true, true);
+                break;
+            case RoadEvents.Rest:
+                player.Rest = true;
+                break;
+            case RoadEvents.GetMoney:
+                player.GetMoney(road.EventParameter);
+                break;
+            case RoadEvents.PayMoney:
+                player.GetMoney(road.EventParameter * -1);
+                break;
+            case RoadEvents.FindWork:
+                player.Profession = road.EventParameter;
+                break;
+            case RoadEvents.Payday:
+                player.GetMoney(Salary(player.Profession, player.SalaryRank));
+                player.PaydayFlag = false;
+                break;
+            case RoadEvents.Marriage:
+
+                break;
+            case RoadEvents.Childbirth:
+
+                break;
+            case RoadEvents.RoadBranch:
+                yield return Branch(player);
+                break;
+            case RoadEvents.Goal:
+                player.Goal = true;
+                break;
+        }
+        yield return null;
+    }
+    IEnumerator Branch(PlayerController player)
+    {
+        m_roulette.gameObject.SetActive(true);
+        int[] lineup = { 0, 1 };
+        m_roulette.GetLineup(lineup);
+        yield return m_roulette.RouletteStart();
+        player.BranchNumber = m_roulette.Number;
     }
     /// <summary>
     /// フェードを制御する
