@@ -117,7 +117,6 @@ public class PlayerController : MonoBehaviour
     {
         m_nameTextImage.transform.rotation = Camera.main.transform.rotation;
     }
-
     /// <summary>
     /// Š‹à‚ğ•Ï“®‚³‚¹‚é
     /// </summary>

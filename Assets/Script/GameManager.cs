@@ -75,6 +75,7 @@ public class GameManager : MonoBehaviour
         m_Roads = new RoadController[5, 2, 20];
         m_first.RoadSetUp(null, m_first.RoadNumber, this);
     }
+
     void Update()
     {
 

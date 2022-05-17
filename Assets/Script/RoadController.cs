@@ -22,13 +22,17 @@ public class RoadController : MonoBehaviour
         FindWork = 5,
         /// <summary>給料日</summary>
         Payday = 6,
+        /// <summary>結婚</summary>
+        Marriage = 7,
+        /// <summary>出産</summary>
+        Childbirth = 8,
         /// <summary>ゴール</summary>
-        Goal = 7,
+        Goal = 10,
     }
     /// <summary>マス番号</summary>
     [SerializeField] string m_roadNumber;
     /// <summary>マス番号表示</summary>
-    [SerializeField] Text m_roadNumberText = null;
+    [SerializeField] TextMesh m_roadNumberText = null;
     /// <summary>車が止まる場所</summary>
     [SerializeField] Transform m_stopPoint = null;
     /// <summary>次のマスの接続部</summary>
@@ -222,6 +226,12 @@ public class RoadController : MonoBehaviour
             case RoadEvents.Payday:
                 player.GetMoney(m_gameManager.Salary(player.Profession, player.SalaryRank));
                 player.PaydayFlag = false;
+                break;
+            case RoadEvents.Marriage:
+                
+                break;
+            case RoadEvents.Childbirth:
+                
                 break;
             case RoadEvents.Goal:
                 player.Goal = true;
