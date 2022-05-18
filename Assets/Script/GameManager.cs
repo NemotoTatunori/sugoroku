@@ -64,13 +64,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text m_playerStatusProfessionBoxText = null;
     /// <summary>給料ランクを表示する</summary>
     [SerializeField] Text m_playerStatusSalaryRankBoxText = null;
-    /// <summary>子供を追加するパネル</summary>
-    [SerializeField] GameObject m_addHumanPanel = null;
-    /// <summary>子供の名前を取得するテキスト</summary>
-    [SerializeField] Text m_childNameText = null;
+    /// <summary>車に人を追加するパネル</summary>
+    [SerializeField] AddHumanPanelController m_addHumanPanel = null;
 
     void Start()
     {
+        m_addHumanPanel.GetGameManager(this);
         m_Roads = new RoadController[5, 2, 20];
         m_first.RoadSetUp(null, m_first.RoadNumber, this);
     }
@@ -281,6 +280,11 @@ public class GameManager : MonoBehaviour
         }
         yield return null;
     }
+    /// <summary>
+    /// 分岐道の行先を決める
+    /// </summary>
+    /// <param name="player">決めるプレイヤー</param>
+    /// <returns></returns>
     IEnumerator Branch(PlayerController player)
     {
         m_roulette.gameObject.SetActive(true);
