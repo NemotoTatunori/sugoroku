@@ -6,19 +6,22 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     /// <summary>進行のステート</summary>
-    enum State
+    enum ProgressState
     {
         FadeIn = 0,
-        PlayerCheck = 1,
+        TurnText = 1,
         Roulette = 2,
         PlayerMove = 3,
         RoadText = 4,
         Event = 5,
-        FadeOut = 6,
+        TurnEnd = 6,
+        FadeOut = 7,
+        PlayerCheck = 8,
     }
     /// <summary>最大人数</summary>
     int m_maxEntry = 30;
     Coroutine m_coroutine;
+    /// <summary>フェードパネル</summary>
     [SerializeField] Image m_fadePanel = null;
 
     //エントリーパネルで使う変数
@@ -44,11 +47,11 @@ public class GameManager : MonoBehaviour
 
     //ゲームで使う変数
     /// <summary>職業一覧</summary>
-    string[] m_professions = { "スポーツ選手", "プログラマー", "パティシエ", "料理人", "大工" };
+    string[] m_professions = { "フリーター", "スポーツ選手", "プログラマー", "パティシエ", "料理人", "大工" };
     /// <summary>給料一覧</summary>
     int[,] m_salarys = {
-        { 10000, 11000, 12000, 13000, 14000 },
-        { 30000, 29000, 28000, 27000, 26000 } };
+        {5000, 10000, 11000, 12000, 13000, 14000 },
+        {10000, 30000, 29000, 28000, 27000, 26000 } };
     /// <summary>カメラ</summary>
     [SerializeField] CameraController m_camera = null;
     /// <summary>最初のマス</summary>
@@ -66,7 +69,7 @@ public class GameManager : MonoBehaviour
     /// <summary>ルーレットのデフォルト数</summary>
     int[] m_rouletteLineupDefault = { 1, 2, 3, 4, 5 };
     /// <summary>テキストを表示する</summary>
-    [SerializeField] Text m_roadText = null;
+    [SerializeField] Text m_progressText = null;
     /// <summary>名前を表示する</summary>
     [SerializeField] Text m_playerStatusNameBoxText = null;
     /// <summary>所持金を表示する</summary>
@@ -78,7 +81,7 @@ public class GameManager : MonoBehaviour
     /// <summary>車に人を追加するパネル</summary>
     [SerializeField] AddHumanPanelController m_addHumanPanel = null;
     /// <summary>進行のステート</summary>
-    State m_state = State.FadeIn;
+    ProgressState m_state = ProgressState.FadeIn;
 
     void Start()
     {
@@ -136,7 +139,6 @@ public class GameManager : MonoBehaviour
             {
                 m_roulette.GetLineup(m_rouletteLineupDefault);
                 PlayerStatusBoxUpdata();
-                m_coroutine = StartCoroutine(GameProgress());
                 Progress();
             }
         }
@@ -173,122 +175,78 @@ public class GameManager : MonoBehaviour
     /// <param name="t"></param>
     public void TextDisplay(string t)
     {
-        m_roadText.transform.parent.gameObject.SetActive(true);
-        m_roadText.text = t;
+        m_progressText.transform.parent.gameObject.SetActive(true);
+        m_progressText.text = t;
     }
     /// <summary>
     /// ゲーム進行のステート管理
     /// </summary>
     public void Progress()
     {
-        //製作中によりまだ動かさない
-        bool a = true;
-        if (a)
-        {
-            return;
-        }
         switch (m_state)
         {
-            case State.FadeIn:
-                m_state = State.Roulette;
-
+            case ProgressState.FadeIn:
+                if (!m_players[m_order].Rest)
+                {
+                    m_state = ProgressState.TurnText;
+                    TextDisplay(m_players[m_order].OwnerName + "さんの番です");
+                }
+                else
+                {
+                    m_state = ProgressState.TurnEnd;
+                    TextDisplay(m_players[m_order].OwnerName + "さんはお休みのようです");
+                    m_players[m_order].Rest = false;
+                }
                 break;
-            case State.Roulette:
-                m_state = State.PlayerMove;
+            case ProgressState.TurnText:
+                m_progressText.transform.parent.gameObject.SetActive(false);
+                m_state = ProgressState.Roulette;
+                m_camera.Move = true;
+                m_roulette.gameObject.SetActive(true);
+                m_roulette.RouletteStart();
                 break;
-            case State.PlayerMove:
-                m_state = State.RoadText;
+            case ProgressState.Roulette:
+                m_state = ProgressState.PlayerMove;
+                m_players[m_order].MoveStart(m_roulette.Number, false, false);
                 break;
-            case State.RoadText:
-                m_state = State.Event;
+            case ProgressState.PlayerMove:
+                m_state = ProgressState.RoadText;
+                TextDisplay(m_players[m_order].Location.EventText());
                 break;
-            case State.Event:
-                m_state = State.FadeOut;
+            case ProgressState.RoadText:
+                Debug.Log(m_state);
+                m_progressText.transform.parent.gameObject.SetActive(false);
+                m_state = ProgressState.Event;
+                StartCoroutine(RoadEvent(m_players[m_order], m_players[m_order].Location));
+                Debug.Log(m_state);
+                break;
+            case ProgressState.Event:
+                Debug.Log(m_state);
+                m_state = ProgressState.TurnEnd;
+                TextDisplay(m_players[m_order].OwnerName + "さんの番は終わりです");
+                break;
+            case ProgressState.TurnEnd:
+                Debug.Log(m_state);
+                m_progressText.transform.parent.gameObject.SetActive(false);
+                m_state = ProgressState.FadeOut;
                 StartCoroutine(Fade(false));
                 break;
-            case State.FadeOut:
-                m_state = State.FadeIn;
-
+            case ProgressState.FadeOut:
+                Debug.Log(m_state);
+                m_state = ProgressState.PlayerCheck;
+                TurnChange();
+                PlayerController p = m_players[m_order];
+                p.transform.position = p.Location.StopPint.position;
+                m_camera.PositionSet(p.transform.position);
+                m_camera.Move = false;
                 break;
-            case State.PlayerCheck:
-                m_state = State.Roulette;
+            case ProgressState.PlayerCheck:
+                Debug.Log(m_state);
+                m_state = ProgressState.FadeIn;
                 StartCoroutine(Fade(true));
                 break;
         }
     }
-    /// <summary>
-    /// ゲームサイクル
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator GameProgress()
-    {
-        PlayerController p = m_players[m_order];
-        p.transform.position = p.Location.StopPint.position;
-        m_camera.PositionSet(p.transform.position);
-        yield return Fade(true);
-
-        if (!p.Rest)
-        {
-            TextDisplay(p.OwnerName + "さんの番です");
-            while (true)
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    m_roadText.transform.parent.gameObject.SetActive(false);
-                    m_camera.Move = true;
-                    break;
-                }
-                yield return null;
-            }
-            //ルーレットを表示
-            m_roulette.gameObject.SetActive(true);
-
-            //ルーレットを動かす
-            yield return m_roulette.RouletteStart();
-
-            //出た数値を車に送る
-            yield return p.MoveStart(m_roulette.Number, false, false);
-
-            //マスのテキストを表示する
-            TextDisplay(p.Location.EventText());
-
-            while (true)
-            {
-                //クリック入力があるまで待つ
-                if (Input.GetMouseButtonDown(0))
-                {
-                    m_roadText.transform.parent.gameObject.SetActive(false);
-                    break;
-                }
-                yield return null;
-            }
-
-            //止まったマスのイベントを呼ぶ
-            yield return RoadEvent(p, p.Location);
-        }
-        else
-        {
-            TextDisplay(p.OwnerName + "さんはお休みのようです");
-            while (true)
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    m_roadText.transform.parent.gameObject.SetActive(false);
-                    break;
-                }
-                yield return null;
-            }
-            p.Rest = false;
-        }
-        if (p.PaydayFlag)
-        {
-            p.GetMoney(Salary(p.Profession, p.SalaryRank));
-        }
-        yield return Fade(false);
-        m_camera.Move = false;
-        TurnChange();
-    }
-
     /// <summary>
     /// マスのイベント
     /// </summary>
@@ -305,31 +263,39 @@ public class GameManager : MonoBehaviour
                 break;
             case RoadEvents.Rest:
                 player.Rest = true;
+                Progress();
                 break;
             case RoadEvents.GetMoney:
                 player.GetMoney(road.EventParameter);
+                
+                Progress();
                 break;
             case RoadEvents.PayMoney:
                 player.GetMoney(road.EventParameter * -1);
+                Progress();
                 break;
             case RoadEvents.FindWork:
                 player.Profession = road.EventParameter;
+                Progress();
                 break;
             case RoadEvents.Payday:
                 player.GetMoney(Salary(player.Profession, player.SalaryRank));
                 player.PaydayFlag = false;
+                Progress();
                 break;
             case RoadEvents.Marriage:
-
+                Progress();
                 break;
             case RoadEvents.Childbirth:
-
+                Progress();
                 break;
             case RoadEvents.RoadBranch:
                 yield return Branch(player);
+                Progress();
                 break;
             case RoadEvents.Goal:
                 player.Goal = true;
+                Progress();
                 break;
         }
         yield return null;
@@ -382,13 +348,8 @@ public class GameManager : MonoBehaviour
         Progress();
         m_fadePanel.gameObject.SetActive(false);
     }
-    IEnumerator Frist()
-    {
-        yield return Fade(false);
-        m_entryPanel.SetActive(false);
-        m_coroutine = StartCoroutine(GameProgress());
-    }
 
+    
     //エントリーパネルで使うメソッド
     /// <summary>
     /// ゲームをスタートさせる
@@ -429,9 +390,10 @@ public class GameManager : MonoBehaviour
             StopCoroutine(m_coroutine);
         }
         PlayerStatusBoxUpdata();
-        StartCoroutine(Frist());
-        m_state = State.FadeOut;
+        m_state = ProgressState.FadeOut;
+        m_order = m_players.Length;
         StartCoroutine(Fade(false));
+        m_entryPanel.SetActive(false);
     }
     /// <summary>
     /// エントリーさせる
