@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Image m_nameTextImage = null;
     /// <summary>名前を表示するテキスト</summary>
     [SerializeField] Text m_nameText = null;
+    GameManager m_gameManager;
     /// <summary>分岐道の行先</summary>
     int m_branchNumber = 0;
     /// <summary>ゴールのフラグ</summary>
@@ -130,7 +131,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     /// <param name="name">名前</param>
     /// <param name="location">最初のマス</param>
-    public void Seting(string name, RoadController location)
+    public void Seting(string name, RoadController location,GameManager gm)
     {
         m_sittings = new bool[m_Seats.Length];
         m_family = new Human[m_Seats.Length];
@@ -142,6 +143,7 @@ public class PlayerController : MonoBehaviour
         m_ownerName = name;
         m_nameText.text = m_ownerName;
         m_location = location;
+        m_gameManager = gm;
     }
     /// <summary>
     /// 家族を増やす
@@ -228,6 +230,7 @@ public class PlayerController : MonoBehaviour
             }
             yield return null;
         }
+        m_gameManager.Progress();
     }
     /// <summary>
     /// 動く距離を返す

@@ -5,6 +5,17 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    /// <summary>進行のステート</summary>
+    enum State
+    {
+        FadeIn = 0,
+        PlayerCheck = 1,
+        Roulette = 2,
+        PlayerMove = 3,
+        RoadText = 4,
+        Event = 5,
+        FadeOut = 6,
+    }
     /// <summary>最大人数</summary>
     int m_maxEntry = 30;
     Coroutine m_coroutine;
@@ -66,10 +77,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text m_playerStatusSalaryRankBoxText = null;
     /// <summary>車に人を追加するパネル</summary>
     [SerializeField] AddHumanPanelController m_addHumanPanel = null;
+    /// <summary>進行のステート</summary>
+    State m_state = State.FadeIn;
 
     void Start()
     {
         m_addHumanPanel.GetGameManager(this);
+        m_roulette.GetGameManager(this);
         m_Roads = new RoadController[5, 2, 20];
         m_first.RoadSetUp(null, m_first.RoadNumber, this);
     }
@@ -123,6 +137,7 @@ public class GameManager : MonoBehaviour
                 m_roulette.GetLineup(m_rouletteLineupDefault);
                 PlayerStatusBoxUpdata();
                 m_coroutine = StartCoroutine(GameProgress());
+                Progress();
             }
         }
         else
@@ -161,7 +176,46 @@ public class GameManager : MonoBehaviour
         m_roadText.transform.parent.gameObject.SetActive(true);
         m_roadText.text = t;
     }
+    /// <summary>
+    /// ゲーム進行のステート管理
+    /// </summary>
+    public void Progress()
+    {
+        //製作中によりまだ動かさない
+        bool a = true;
+        if (a)
+        {
+            return;
+        }
+        switch (m_state)
+        {
+            case State.FadeIn:
+                m_state = State.Roulette;
 
+                break;
+            case State.Roulette:
+                m_state = State.PlayerMove;
+                break;
+            case State.PlayerMove:
+                m_state = State.RoadText;
+                break;
+            case State.RoadText:
+                m_state = State.Event;
+                break;
+            case State.Event:
+                m_state = State.FadeOut;
+                StartCoroutine(Fade(false));
+                break;
+            case State.FadeOut:
+                m_state = State.FadeIn;
+
+                break;
+            case State.PlayerCheck:
+                m_state = State.Roulette;
+                StartCoroutine(Fade(true));
+                break;
+        }
+    }
     /// <summary>
     /// ゲームサイクル
     /// </summary>
@@ -239,7 +293,7 @@ public class GameManager : MonoBehaviour
     /// マスのイベント
     /// </summary>
     /// <returns></returns>
-    public virtual IEnumerator RoadEvent(PlayerController player,RoadController road)
+    public virtual IEnumerator RoadEvent(PlayerController player, RoadController road)
     {
         switch (road.Event)
         {
@@ -325,6 +379,7 @@ public class GameManager : MonoBehaviour
             }
             m_fadePanel.color = new Color(0, 0, 0, 1);
         }
+        Progress();
         m_fadePanel.gameObject.SetActive(false);
     }
     IEnumerator Frist()
@@ -333,6 +388,7 @@ public class GameManager : MonoBehaviour
         m_entryPanel.SetActive(false);
         m_coroutine = StartCoroutine(GameProgress());
     }
+
     //エントリーパネルで使うメソッド
     /// <summary>
     /// ゲームをスタートさせる
@@ -359,7 +415,7 @@ public class GameManager : MonoBehaviour
             car.transform.position = new Vector3(px + x * 5, 0, z * -10);
             m_players[i] = car.GetComponent<PlayerController>();
             EntryNamePrefab en = m_entryNameDisplay.transform.GetChild(i).GetComponent<EntryNamePrefab>();
-            m_players[i].Seting(en.Name, m_first);
+            m_players[i].Seting(en.Name, m_first, this);
             m_players[i].AddHuman(en.Seibetu, en.Name);
             x++;
             if (x >= 10)
@@ -374,6 +430,8 @@ public class GameManager : MonoBehaviour
         }
         PlayerStatusBoxUpdata();
         StartCoroutine(Frist());
+        m_state = State.FadeOut;
+        StartCoroutine(Fade(false));
     }
     /// <summary>
     /// エントリーさせる

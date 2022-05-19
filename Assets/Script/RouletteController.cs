@@ -22,11 +22,20 @@ public class RouletteController : MonoBehaviour
     /// <summary>出た数字</summary>
     int m_number = 0;
 
+    GameManager m_gameManager;
+
     public int Number
     {
         get => m_number;
     }
-
+    /// <summary>
+    /// ゲームマネージャーを受け取る
+    /// </summary>
+    /// <param name="gm">ゲームマネージャー</param>
+    public void GetGameManager(GameManager gm)
+    {
+        m_gameManager = gm;
+    }
     /// <summary>
     /// ルーレットをスタートさせる
     /// </summary>
@@ -87,5 +96,6 @@ public class RouletteController : MonoBehaviour
         yield return new WaitForSeconds(1f);
         m_StartButton.SetActive(true);
         this.gameObject.SetActive(false);
+        m_gameManager.Progress();
     }
 }
