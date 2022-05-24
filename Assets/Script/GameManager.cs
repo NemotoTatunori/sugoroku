@@ -80,6 +80,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text m_playerStatusSalaryRankBoxText = null;
     /// <summary>車に人を追加するパネル</summary>
     [SerializeField] AddHumanPanelController m_addHumanPanel = null;
+    /// <summary>就職パネル</summary>
+    [SerializeField] GameObject m_findWorkPanel = null;
+    /// <summary>就職パネルの表示テキスト</summary>
+    [SerializeField] Text m_findWorkText = null;
+    /// <summary>ターンエンドボタン</summary>
+    [SerializeField] GameObject m_turnEndButton = null;
     /// <summary>進行のステート</summary>
     ProgressState m_state = ProgressState.FadeIn;
 
@@ -156,7 +162,8 @@ public class GameManager : MonoBehaviour
     /// <returns>給料</returns>
     public int Salary(int profession, int salaryRank)
     {
-        return m_salarys[profession, salaryRank];
+        Debug.Log("Salary");
+        return m_salarys[salaryRank, profession];
     }
     /// <summary>
     /// プレイヤーステータスボックスを更新する
@@ -201,38 +208,34 @@ public class GameManager : MonoBehaviour
             case ProgressState.TurnText:
                 m_progressText.transform.parent.gameObject.SetActive(false);
                 m_state = ProgressState.Roulette;
-                m_camera.Move = true;
                 m_roulette.gameObject.SetActive(true);
                 m_roulette.RouletteStart();
                 break;
             case ProgressState.Roulette:
                 m_state = ProgressState.PlayerMove;
-                m_players[m_order].MoveStart(m_roulette.Number, false, false);
+                m_players[m_order].MoveStart(m_roulette.Number, false, false, m_camera);
                 break;
             case ProgressState.PlayerMove:
                 m_state = ProgressState.RoadText;
                 TextDisplay(m_players[m_order].Location.EventText());
                 break;
             case ProgressState.RoadText:
-                Debug.Log(m_state);
                 m_progressText.transform.parent.gameObject.SetActive(false);
                 m_state = ProgressState.Event;
-                StartCoroutine(RoadEvent(m_players[m_order], m_players[m_order].Location));
-                Debug.Log(m_state);
+                RoadEvent(m_players[m_order]);
                 break;
             case ProgressState.Event:
-                Debug.Log(m_state);
                 m_state = ProgressState.TurnEnd;
-                TextDisplay(m_players[m_order].OwnerName + "さんの番は終わりです");
+                m_progressText.transform.parent.gameObject.SetActive(false);
+                m_camera.Move = true;
+                m_turnEndButton.SetActive(true);
                 break;
             case ProgressState.TurnEnd:
-                Debug.Log(m_state);
-                m_progressText.transform.parent.gameObject.SetActive(false);
+                m_turnEndButton.SetActive(false);
                 m_state = ProgressState.FadeOut;
                 StartCoroutine(Fade(false));
                 break;
             case ProgressState.FadeOut:
-                Debug.Log(m_state);
                 m_state = ProgressState.PlayerCheck;
                 TurnChange();
                 PlayerController p = m_players[m_order];
@@ -241,7 +244,6 @@ public class GameManager : MonoBehaviour
                 m_camera.Move = false;
                 break;
             case ProgressState.PlayerCheck:
-                Debug.Log(m_state);
                 m_state = ProgressState.FadeIn;
                 StartCoroutine(Fade(true));
                 break;
@@ -251,15 +253,16 @@ public class GameManager : MonoBehaviour
     /// マスのイベント
     /// </summary>
     /// <returns></returns>
-    public virtual IEnumerator RoadEvent(PlayerController player, RoadController road)
+    public void RoadEvent(PlayerController player)
     {
+        RoadController road = player.Location;
         switch (road.Event)
         {
             case RoadEvents.Go:
-                yield return player.MoveStart(road.EventParameter, false, true);
+                player.MoveStart(road.EventParameter, false, true, m_camera);
                 break;
             case RoadEvents.Return:
-                yield return player.MoveStart(road.EventParameter, true, true);
+                player.MoveStart(road.EventParameter, true, true, m_camera);
                 break;
             case RoadEvents.Rest:
                 player.Rest = true;
@@ -267,38 +270,65 @@ public class GameManager : MonoBehaviour
                 break;
             case RoadEvents.GetMoney:
                 player.GetMoney(road.EventParameter);
-                
-                Progress();
+                TextDisplay(player.OwnerName + "さんは" + road.EventParameter + "得た！");
                 break;
             case RoadEvents.PayMoney:
                 player.GetMoney(road.EventParameter * -1);
-                Progress();
+                TextDisplay(player.OwnerName + "さんは" + road.EventParameter + "支払った");
                 break;
             case RoadEvents.FindWork:
-                player.Profession = road.EventParameter;
-                Progress();
+                m_findWorkText.text = m_professions[road.EventParameter] + "になりますか？\n\n※なると分岐終わりまで進む";
+                m_findWorkPanel.SetActive(true);
                 break;
             case RoadEvents.Payday:
                 player.GetMoney(Salary(player.Profession, player.SalaryRank));
+                TextDisplay(player.OwnerName + "さんは給料として" + m_salarys[player.SalaryRank, player.Profession] + "得た！");
                 player.PaydayFlag = false;
-                Progress();
                 break;
             case RoadEvents.Marriage:
-                Progress();
+
                 break;
             case RoadEvents.Childbirth:
-                Progress();
+
                 break;
             case RoadEvents.RoadBranch:
-                yield return Branch(player);
-                Progress();
+                StartCoroutine(Branch(player));
                 break;
             case RoadEvents.Goal:
                 player.Goal = true;
                 Progress();
                 break;
         }
-        yield return null;
+    }
+    /// <summary>
+    /// 就職マス処理
+    /// </summary>
+    /// <param name="answer">応え</param>
+    public void FindWorkMove(bool answer)
+    {
+        m_findWorkPanel.SetActive(false);
+        if (!answer)
+        {
+            Progress();
+            return;
+        }
+        m_state = ProgressState.RoadText;
+        PlayerController player = m_players[m_order];
+        RoadController road = player.Location;
+        player.Profession = road.EventParameter;
+        int mv = 1;
+        while (road.NextRoad(0).Event != RoadEvents.Payday)
+        {
+            road = road.NextRoad(0);
+            mv++;
+            if (mv >= 100)
+            {
+                mv = 0;
+                Debug.Log("無限ループ");
+                break;
+            }
+        }
+        player.MoveStart(mv, false, true, m_camera);
     }
     /// <summary>
     /// 分岐道の行先を決める
@@ -349,7 +379,7 @@ public class GameManager : MonoBehaviour
         m_fadePanel.gameObject.SetActive(false);
     }
 
-    
+
     //エントリーパネルで使うメソッド
     /// <summary>
     /// ゲームをスタートさせる

@@ -163,9 +163,9 @@ public class PlayerController : MonoBehaviour
     /// <param name="m">進む数</param>
     /// <param name="reverse">進む方向</param>
     /// <returns></returns>
-    public Coroutine MoveStart(int m, bool reverse, bool e)
+    public Coroutine MoveStart(int m, bool reverse, bool e, CameraController c)
     {
-        return StartCoroutine(Move(m, reverse, e));
+        return StartCoroutine(Move(m, reverse, e, c));
     }
     /// <summary>
     /// 移動するコルーチン
@@ -173,7 +173,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="m">進む数</param>
     /// <param name="reverse">進む方向</param>
     /// <returns></returns>
-    IEnumerator Move(int m, bool reverse, bool e)
+    IEnumerator Move(int m, bool reverse, bool e,CameraController c)
     {
         yield return null;
         for (int i = 0; i < m; i++)
@@ -212,6 +212,7 @@ public class PlayerController : MonoBehaviour
                     f++;
                 }
                 transform.position = new Vector3(x, y, z);
+                c.PositionSet(transform.position);
                 yield return null;
             }
             transform.position = next;

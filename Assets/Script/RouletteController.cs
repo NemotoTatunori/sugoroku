@@ -23,7 +23,7 @@ public class RouletteController : MonoBehaviour
     int m_number = 0;
 
     GameManager m_gameManager;
-
+    /// <summary>出た数字のプロパティ</summary>
     public int Number
     {
         get => m_number;
