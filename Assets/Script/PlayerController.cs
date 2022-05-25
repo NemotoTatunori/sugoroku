@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     /// <summary>プレイヤーの名前</summary>
-    [SerializeField] string m_ownerName = null;
+    [SerializeField] Human m_owner = null;
     /// <summary>職業</summary>
     [SerializeField] int m_profession = 0;
     /// <summary>給料ランク</summary>
@@ -41,15 +41,9 @@ public class PlayerController : MonoBehaviour
     /// <summary>ゴールのフラグ</summary>
     bool m_goal;
     /// <summary>名前のプロパティ</summary>
-    public string OwnerName
-    {
-        get => m_ownerName;
-    }
+    public Human Owner => m_owner;
     /// <summary>所持金のプロパティ</summary>
-    public int Money
-    {
-        get => m_money;
-    }
+    public int Money => m_money;
     /// <summary>現在位置のプロパティ</summary>
     public RoadController Location
     {
@@ -131,7 +125,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     /// <param name="name">名前</param>
     /// <param name="location">最初のマス</param>
-    public void Seting(string name, RoadController location,GameManager gm)
+    public void Seting(RoadController location, GameManager gm)
     {
         m_sittings = new bool[m_Seats.Length];
         m_family = new Human[m_Seats.Length];
@@ -140,8 +134,8 @@ public class PlayerController : MonoBehaviour
             m_sittings[i] = false;
         }
         m_sittings[0] = true;
-        m_ownerName = name;
-        m_nameText.text = m_ownerName;
+        m_owner = m_family[0];
+        m_nameText.text = m_owner.Name;
         m_location = location;
         m_gameManager = gm;
     }
@@ -161,11 +155,13 @@ public class PlayerController : MonoBehaviour
     /// 移動するコルーチンを返す
     /// </summary>
     /// <param name="m">進む数</param>
-    /// <param name="reverse">進む方向</param>
+    /// <param name="reverse">戻るフラグ</param>
+    /// <param name="eventF">イベントフラグ</param>
+    /// <param name="camera">追跡するカメラ</param>
     /// <returns></returns>
-    public Coroutine MoveStart(int m, bool reverse, bool e, CameraController c)
+    public Coroutine MoveStart(int m, bool reverse, bool eventF, CameraController camera)
     {
-        return StartCoroutine(Move(m, reverse, e, c));
+        return StartCoroutine(Move(m, reverse, eventF, camera));
     }
     /// <summary>
     /// 移動するコルーチン
@@ -173,7 +169,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="m">進む数</param>
     /// <param name="reverse">進む方向</param>
     /// <returns></returns>
-    IEnumerator Move(int m, bool reverse, bool e,CameraController c)
+    IEnumerator Move(int m, bool reverse, bool e, CameraController c)
     {
         yield return null;
         for (int i = 0; i < m; i++)

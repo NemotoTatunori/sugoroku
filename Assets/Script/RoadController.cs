@@ -58,10 +58,7 @@ public class RoadController : MonoBehaviour
     /// <summary>ゲームマネージャー</summary>
     protected GameManager m_gameManager;
     /// <summary>前のマスの接続部のプロパティ</summary>
-    public Transform[] PrevConnect
-    {
-        get => m_prevConnect;
-    }
+    public Transform[] PrevConnect => m_prevConnect;
     /// <summary>マス番号のプロパティ</summary>
     public string RoadNumber
     {
@@ -73,35 +70,17 @@ public class RoadController : MonoBehaviour
         }
     }
     /// <summary>位置補正のプロパティ</summary>
-    public bool PositionCorrection
-    {
-        get => m_positionCorrection;
-    }
+    public bool PositionCorrection => m_positionCorrection;
     /// <summary>ストップマスのプロパティ</summary>
-    public bool StopFlag
-    {
-        get => m_stopFlag;
-    }
+    public bool StopFlag => m_stopFlag;
     /// <summary>車が止まる場所のプロパティ</summary>
-    public Transform StopPint
-    {
-        get => m_stopPoint;
-    }
+    public Transform StopPint => m_stopPoint;
     /// <summary>一つ前のマスのプロパティ</summary>
-    public RoadController PrevRoad
-    {
-        get => m_prevRoads[0];
-    }
+    public RoadController PrevRoad => m_prevRoads[0];
     /// <summary>イベントのプロパティ</summary>
-    public RoadEvents Event
-    {
-        get => m_event;
-    }
-
-    public int EventParameter
-    {
-        get => m_eventParameter;
-    }
+    public RoadEvents Event => m_event;
+    /// <summary>イベントパラメーターのプロパティ</summary>
+    public int EventParameter => m_eventParameter;
 
     void Start()
     {
@@ -227,5 +206,5 @@ public class RoadController : MonoBehaviour
         return AText;
     }
 
-    
+
 }

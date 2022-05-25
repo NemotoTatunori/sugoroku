@@ -6,16 +6,16 @@ public class Human : MonoBehaviour
 {
     /// <summary>名前</summary>
     [SerializeField] string m_name = null;
-    /// <summary>性別</summary>
-    [SerializeField] string m_seibetu = null;
+    /// <summary>性別(t:男,f:女)</summary>
+    [SerializeField] bool m_seibetu;
     /// <summary>体の色一覧</summary>
     [SerializeField] Material[] m_bodyColors = null;
     /// <summary>体</summary>
     [SerializeField] GameObject m_body;
-    void Start()
-    {
-
-    }
+    /// <summary>名前のプロパティ</summary>
+    public string Name => m_name;
+    /// <summary>性別のプロパティ</summary>
+    public bool Seibetu => m_seibetu;
     /// <summary>
     /// 人のセッティング
     /// </summary>
@@ -24,14 +24,13 @@ public class Human : MonoBehaviour
     public void Seting(bool seibetu,string name)
     {
         m_name = name;
-        if (seibetu)
+        m_seibetu = seibetu;
+        if (m_seibetu)
         {
-            m_seibetu = "男";
             m_body.GetComponent<Renderer>().material = m_bodyColors[0];
         }
         else
         {
-            m_seibetu = "女";
             m_body.GetComponent<Renderer>().material = m_bodyColors[1];
         }
     }

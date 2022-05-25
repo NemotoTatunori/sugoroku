@@ -9,7 +9,7 @@ public class AddHumanPanelController : MonoBehaviour
     GameManager m_gameManager;
     /// <summary>イベント内容を表示するテキスト</summary>
     [SerializeField] Text m_eventNameText = null;
-    /// <summary>名前を受け取るテキスト</summary>
+    /// <summary>追加する人の名前を受け取るテキスト</summary>
     [SerializeField] Text m_nameText = null;
     /// <summary>結婚イベントボタン</summary>
     [SerializeField] GameObject m_fianceButton;
@@ -19,11 +19,6 @@ public class AddHumanPanelController : MonoBehaviour
     [SerializeField] GameObject m_girlButton;
     /// <summary>テキストに表示する文字候補</summary>
     string[] m_eventName = { "婚姻届", "子供が生まれた！" };
-
-    private void Start()
-    {
-
-    }
     /// <summary>
     /// 表示するパネルのセッティング
     /// </summary>
@@ -46,20 +41,14 @@ public class AddHumanPanelController : MonoBehaviour
                 break;
         }
     }
-
-    public void Fiance()
+    /// <summary>
+    /// 人を追加するボタンにつける
+    /// </summary>
+    /// <param name="p">パターン</param>
+    public void AddHumanButton(int p)
     {
-
-    }
-
-    public void Boy()
-    {
-
-    }
-
-    public void Girl()
-    {
-
+        m_gameManager.AddHumanEvent(p,m_nameText.text);
+        gameObject.SetActive(false);
     }
     /// <summary>
     /// ゲームマネージャーを受け取る

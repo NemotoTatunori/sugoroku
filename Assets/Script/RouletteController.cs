@@ -24,10 +24,7 @@ public class RouletteController : MonoBehaviour
 
     GameManager m_gameManager;
     /// <summary>出た数字のプロパティ</summary>
-    public int Number
-    {
-        get => m_number;
-    }
+    public int Number => m_number;
     /// <summary>
     /// ゲームマネージャーを受け取る
     /// </summary>

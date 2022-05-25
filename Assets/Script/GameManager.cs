@@ -160,18 +160,17 @@ public class GameManager : MonoBehaviour
     /// <param name="profession">職業</param>
     /// <param name="salaryRank">ランク</param>
     /// <returns>給料</returns>
-    public int Salary(int profession, int salaryRank)
+    int Salary(int profession, int salaryRank)
     {
-        Debug.Log("Salary");
         return m_salarys[salaryRank, profession];
     }
     /// <summary>
     /// プレイヤーステータスボックスを更新する
     /// </summary>
-    public void PlayerStatusBoxUpdata()
+    void PlayerStatusBoxUpdata()
     {
         PlayerController p = m_players[m_order];
-        m_playerStatusNameBoxText.text = p.OwnerName;
+        m_playerStatusNameBoxText.text = p.Owner.Name;
         m_playerStatusMoneyBoxText.text = p.Money.ToString();
         m_playerStatusProfessionBoxText.text = m_professions[p.Profession];
         m_playerStatusSalaryRankBoxText.text = p.SalaryRank.ToString();
@@ -180,7 +179,7 @@ public class GameManager : MonoBehaviour
     /// 表示するテキストを更新して表示する
     /// </summary>
     /// <param name="t"></param>
-    public void TextDisplay(string t)
+    void TextDisplay(string t)
     {
         m_progressText.transform.parent.gameObject.SetActive(true);
         m_progressText.text = t;
@@ -196,12 +195,12 @@ public class GameManager : MonoBehaviour
                 if (!m_players[m_order].Rest)
                 {
                     m_state = ProgressState.TurnText;
-                    TextDisplay(m_players[m_order].OwnerName + "さんの番です");
+                    TextDisplay(m_players[m_order].Owner + "さんの番です");
                 }
                 else
                 {
                     m_state = ProgressState.TurnEnd;
-                    TextDisplay(m_players[m_order].OwnerName + "さんはお休みのようです");
+                    TextDisplay(m_players[m_order].Owner + "さんはお休みのようです");
                     m_players[m_order].Rest = false;
                 }
                 break;
@@ -253,7 +252,7 @@ public class GameManager : MonoBehaviour
     /// マスのイベント
     /// </summary>
     /// <returns></returns>
-    public void RoadEvent(PlayerController player)
+    void RoadEvent(PlayerController player)
     {
         RoadController road = player.Location;
         switch (road.Event)
@@ -270,11 +269,11 @@ public class GameManager : MonoBehaviour
                 break;
             case RoadEvents.GetMoney:
                 player.GetMoney(road.EventParameter);
-                TextDisplay(player.OwnerName + "さんは" + road.EventParameter + "得た！");
+                TextDisplay(player.Owner + "さんは" + road.EventParameter + "得た！");
                 break;
             case RoadEvents.PayMoney:
-                player.GetMoney(road.EventParameter * -1);
-                TextDisplay(player.OwnerName + "さんは" + road.EventParameter + "支払った");
+                player.GetMoney(-road.EventParameter);
+                TextDisplay(player.Owner + "さんは" + road.EventParameter + "支払った");
                 break;
             case RoadEvents.FindWork:
                 m_findWorkText.text = m_professions[road.EventParameter] + "になりますか？\n\n※なると分岐終わりまで進む";
@@ -282,14 +281,16 @@ public class GameManager : MonoBehaviour
                 break;
             case RoadEvents.Payday:
                 player.GetMoney(Salary(player.Profession, player.SalaryRank));
-                TextDisplay(player.OwnerName + "さんは給料として" + m_salarys[player.SalaryRank, player.Profession] + "得た！");
+                TextDisplay(player.Owner + "さんは給料として" + m_salarys[player.SalaryRank, player.Profession] + "得た！");
                 player.PaydayFlag = false;
                 break;
             case RoadEvents.Marriage:
-
+                m_addHumanPanel.gameObject.SetActive(true);
+                m_addHumanPanel.Set(0);
                 break;
             case RoadEvents.Childbirth:
-
+                m_addHumanPanel.gameObject.SetActive(true);
+                m_addHumanPanel.Set(1);
                 break;
             case RoadEvents.RoadBranch:
                 StartCoroutine(Branch(player));
@@ -299,6 +300,45 @@ public class GameManager : MonoBehaviour
                 Progress();
                 break;
         }
+    }
+    /// <summary>
+    /// 人を追加するイベント
+    /// </summary>
+    /// <param name="p">パターン</param>
+    /// <param name="name">名前</param>
+    public void AddHumanEvent(int p, string name)
+    {
+        switch (p)
+        {
+            case 0:
+                bool s = m_players[m_order].Owner.Seibetu ? false : true;
+                m_players[m_order].AddHuman(s, name);
+                break;
+            case 1:
+                m_players[m_order].AddHuman(true, name);
+                break;
+            case 2:
+                m_players[m_order].AddHuman(false, name);
+                break;
+        }
+    }
+    /// <summary>
+    /// 祝い金処理
+    /// </summary>
+    /// <param name="player">もらうプレイヤー</param>
+    /// <param name="money">金額</param>
+    void Congratulations(PlayerController player, int money)
+    {
+        int m = 0;
+        foreach (var item in m_players)
+        {
+            if (item != player)
+            {
+                m += money;
+                item.GetMoney(-money);
+            }
+        }
+        player.GetMoney(m);
     }
     /// <summary>
     /// 就職マス処理
@@ -406,8 +446,8 @@ public class GameManager : MonoBehaviour
             car.transform.position = new Vector3(px + x * 5, 0, z * -10);
             m_players[i] = car.GetComponent<PlayerController>();
             EntryNamePrefab en = m_entryNameDisplay.transform.GetChild(i).GetComponent<EntryNamePrefab>();
-            m_players[i].Seting(en.Name, m_first, this);
             m_players[i].AddHuman(en.Seibetu, en.Name);
+            m_players[i].Seting(m_first, this);
             x++;
             if (x >= 10)
             {
