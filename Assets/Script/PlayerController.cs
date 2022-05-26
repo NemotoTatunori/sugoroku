@@ -125,7 +125,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     /// <param name="name">ñºëO</param>
     /// <param name="location">ç≈èâÇÃÉ}ÉX</param>
-    public void Seting(RoadController location, GameManager gm)
+    public void Seting(bool seibetu, string name, RoadController location, GameManager gm)
     {
         m_sittings = new bool[m_Seats.Length];
         m_family = new Human[m_Seats.Length];
@@ -134,6 +134,7 @@ public class PlayerController : MonoBehaviour
             m_sittings[i] = false;
         }
         m_sittings[0] = true;
+        AddHuman(seibetu, name);
         m_owner = m_family[0];
         m_nameText.text = m_owner.Name;
         m_location = location;
@@ -217,7 +218,7 @@ public class PlayerController : MonoBehaviour
             {
                 reverse = true;
             }
-            if (m_location.Event == RoadEvents.Payday && !e)
+            if (m_location.Event == RoadEvents.Payday && !e && !reverse)
             {
                 PaydayFlag = true;
             }

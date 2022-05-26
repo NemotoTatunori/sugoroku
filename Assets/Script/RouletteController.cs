@@ -16,7 +16,7 @@ public class RouletteController : MonoBehaviour
     /// <summary>数字を隠す蓋</summary>
     [SerializeField] GameObject m_lid = null;
     /// <summary>選ばれる数字の配列</summary>
-    int[] m_lineup = { 1, 2, 3, 4, 5 };//, 6, 7, 8, 9, 10
+    int[] m_lineup = { 1, 2, 3, 4, 5 };
     /// <summary>ルーレット始動のフラグ</summary>
     bool m_start = false;
     /// <summary>出た数字</summary>

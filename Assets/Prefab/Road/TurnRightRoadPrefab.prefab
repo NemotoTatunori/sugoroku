@@ -711,6 +711,10 @@ MonoBehaviour:
   m_stopFlag: 0
   m_event: 3
   m_eventParameter: 1000
+  m_roadColorDisplay: {fileID: 5254121341317917100}
+  m_roadColors:
+  - {fileID: 2100000, guid: ac729a8c111d22e41a7f831c6f04d290, type: 2}
+  - {fileID: 2100000, guid: 877d9aaa3ea49734b839cf8cd30aa600, type: 2}
 --- !u!1 &5254121341972351631
 GameObject:
   m_ObjectHideFlags: 0

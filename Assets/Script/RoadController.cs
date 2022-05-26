@@ -53,6 +53,10 @@ public class RoadController : MonoBehaviour
     [SerializeField] RoadEvents m_event = RoadEvents.GetMoney;
     /// <summary>イベントのパラメーター</summary>
     [SerializeField] int m_eventParameter = 1000;
+    /// <summary>マスの色を表示する</summary>
+    [SerializeField] GameObject m_roadColorDisplay = null;
+    /// <summary>マスの色候補</summary>
+    [SerializeField] Material[] m_roadColors = null;
     /// <summary>位置補正のフラグ</summary>
     bool m_positionCorrection = false;
     /// <summary>ゲームマネージャー</summary>
@@ -87,6 +91,10 @@ public class RoadController : MonoBehaviour
         if (m_roadNumber != "")
         {
             m_roadNumberText.text = m_roadNumber;
+        }
+        if (m_stopFlag)
+        {
+            m_roadColorDisplay.GetComponent<Renderer>().material = m_roadColors[1];
         }
     }
     /// <summary>
