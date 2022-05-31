@@ -8,18 +8,27 @@ public class GameManager : MonoBehaviour
     /// <summary>進行のステート</summary>
     enum ProgressState
     {
+        /// <summary>フェードイン</summary>
         FadeIn = 0,
+        /// <summary>手番を表示</summary>
         TurnText = 1,
+        /// <summary>ルーレット</summary>
         Roulette = 2,
+        /// <summary>プレイヤー移動</summary>
         PlayerMove = 3,
+        /// <summary>マスのテキスト表示</summary>
         RoadText = 4,
+        /// <summary>マスイベント</summary>
         Event = 5,
+        /// <summary>手番終わり</summary>
         TurnEnd = 6,
+        /// <summary>フェードアウト</summary>
         FadeOut = 7,
+        /// <summary>手番交換</summary>
         PlayerCheck = 8,
     }
     /// <summary>最大人数</summary>
-    int m_maxEntry = 30;
+    private int m_maxEntry = 30;
     Coroutine m_coroutine;
     /// <summary>フェードパネル</summary>
     [SerializeField] Image m_fadePanel = null;
@@ -35,14 +44,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text m_peopleNumText = null;
     /// <summary>エントリー数</summary>
     int m_peopleNum = 0;
-    /// <summary>男の色（水色）</summary>
-    Color m_manColor = new Color(0.6f, 1, 1);
-    /// <summary>女の色（ピンク）</summary>
-    Color m_womanColor = new Color(1, 0.6f, 1);
     /// <summary>警告テキスト</summary>
     [SerializeField] GameObject m_caveatText = null;
     /// <summary>エントリーパネル</summary>
     [SerializeField] GameObject m_entryPanel = null;
+    /// <summary>男の色（水色）</summary>
+    Color m_manColor = new Color(0.6f, 1, 1);
+    /// <summary>女の色（ピンク）</summary>
+    Color m_womanColor = new Color(1, 0.6f, 1);
 
 
     //ゲームで使う変数
@@ -52,6 +61,10 @@ public class GameManager : MonoBehaviour
     int[,] m_salarys = {
         {5000, 10000, 11000, 12000, 13000, 14000 },
         {10000, 30000, 29000, 28000, 27000, 26000 } };
+    /// <summary>ゴールした時のボーナス</summary>
+    int m_goalBonus = 100000;
+    /// <summary>ゴールした人数</summary>
+    int m_goalNumber = 0;
     /// <summary>カメラ</summary>
     [SerializeField] CameraController m_camera = null;
     /// <summary>最初のマス</summary>
@@ -237,8 +250,8 @@ public class GameManager : MonoBehaviour
             case ProgressState.FadeOut:
                 m_state = ProgressState.PlayerCheck;
                 PlayerController p = m_players[m_order];
-                if (p.PaydayFlag) 
-                { 
+                if (p.PaydayFlag)
+                {
                     p.GetMoney(Salary(p.Profession, p.SalaryRank));
                     p.PaydayFlag = false;
                 }
@@ -275,13 +288,13 @@ public class GameManager : MonoBehaviour
                 break;
             case RoadEvents.GetMoney:
                 player.GetMoney(road.EventParameter);
-                PlayerStatusBoxUpdata();
                 TextDisplay(player.Owner.Name + "さんは" + road.EventParameter + "得た！");
+                PlayerStatusBoxUpdata();
                 break;
             case RoadEvents.PayMoney:
                 player.GetMoney(-road.EventParameter);
-                PlayerStatusBoxUpdata();
                 TextDisplay(player.Owner.Name + "さんは" + road.EventParameter + "支払った");
+                PlayerStatusBoxUpdata();
                 break;
             case RoadEvents.FindWork:
                 m_findWorkText.text = m_professions[road.EventParameter] + "になりますか？\n\n※なると分岐終わりまで進む";
@@ -304,9 +317,18 @@ public class GameManager : MonoBehaviour
             case RoadEvents.RoadBranch:
                 StartCoroutine(Branch(player));
                 break;
+            case RoadEvents.PayRaise:
+                player.SalaryRank = player.SalaryRank + 1;
+                TextDisplay(player.Owner.Name + "さんの給料ランクが上がった！");
+                PlayerStatusBoxUpdata();
+                break;
             case RoadEvents.Goal:
+                int bonus = m_goalBonus - m_goalNumber * 10000;
                 player.Goal = true;
-                Progress();
+                player.GetMoney(bonus);
+                m_goalNumber++;
+                TextDisplay(player.Owner.Name + "が" + m_goalNumber + "位でゴールした！\n賞金として" + bonus + "もらった！");
+                PlayerStatusBoxUpdata();
                 break;
         }
     }
@@ -433,48 +455,16 @@ public class GameManager : MonoBehaviour
         m_fadePanel.gameObject.SetActive(false);
     }
 
-
     //エントリーパネルで使うメソッド
     /// <summary>
     /// ゲームをスタートさせる
     /// </summary>
-    public void GameStart()
+    public void GameStart(PlayerController[] players)
     {
-        if (m_peopleNum == 0)
-        {
-            if (m_coroutine != null)
-            {
-                StopCoroutine(m_coroutine);
-            }
-            m_coroutine = StartCoroutine(Caveat("１人もいないよ！"));
-            return;
-        }
-        m_players = new PlayerController[m_peopleNum];
-        float px = (m_peopleNum - 1) * -2.5f;
-        if (m_peopleNum >= 11) { px = 9 * -2.5f; }
-        int x = 0;
-        int z = 0;
-        for (int i = 0; i < m_peopleNum; i++)
-        {
-            GameObject car = Instantiate(m_carPrefab);
-            car.transform.position = new Vector3(px + x * 5, 0, z * -10);
-            m_players[i] = car.GetComponent<PlayerController>();
-            EntryNamePrefab en = m_entryNameDisplay.transform.GetChild(i).GetComponent<EntryNamePrefab>();
-            m_players[i].Seting(en.Seibetu, en.Name, m_first, this);
-            x++;
-            if (x >= 10)
-            {
-                x = 0;
-                z++;
-            }
-        }
-        if (m_coroutine != null)
-        {
-            StopCoroutine(m_coroutine);
-        }
-        PlayerStatusBoxUpdata();
+        m_players = players;
         m_state = ProgressState.PlayerCheck;
         m_order = 0;
+        PlayerStatusBoxUpdata();
         StartCoroutine(Fade(false));
         m_entryPanel.SetActive(false);
     }

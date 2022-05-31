@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>分岐道の行先</summary>
     int m_branchNumber = 0;
     /// <summary>ゴールのフラグ</summary>
-    bool m_goal;
+    bool m_goal = false;
     /// <summary>名前のプロパティ</summary>
     public Human Owner => m_owner;
     /// <summary>所持金のプロパティ</summary>
