@@ -27,32 +27,10 @@ public class GameManager : MonoBehaviour
         /// <summary>手番交換</summary>
         PlayerCheck = 8,
     }
-    /// <summary>最大人数</summary>
-    private int m_maxEntry = 30;
-    Coroutine m_coroutine;
     /// <summary>フェードパネル</summary>
     [SerializeField] Image m_fadePanel = null;
-
-    //エントリーパネルで使う変数
-    /// <summary>参加する人の名前を入力する場所</summary>
-    [SerializeField] Text m_entryName = null;
-    /// <summary>参加する人の名前を表示するプレハブ</summary>
-    [SerializeField] GameObject m_entryNamePrehab = null;
-    /// <summary>参加する人の名前を表示する場所</summary>
-    [SerializeField] GameObject m_entryNameDisplay = null;
-    /// <summary>参加数のテキスト</summary>
-    [SerializeField] Text m_peopleNumText = null;
-    /// <summary>エントリー数</summary>
-    int m_peopleNum = 0;
-    /// <summary>警告テキスト</summary>
-    [SerializeField] GameObject m_caveatText = null;
-    /// <summary>エントリーパネル</summary>
-    [SerializeField] GameObject m_entryPanel = null;
-    /// <summary>男の色（水色）</summary>
-    Color m_manColor = new Color(0.6f, 1, 1);
-    /// <summary>女の色（ピンク）</summary>
-    Color m_womanColor = new Color(1, 0.6f, 1);
-
+    /// <summary>エントリーパネルパネル</summary>
+    [SerializeField] EntryPanelController m_entryPanel = null;
 
     //ゲームで使う変数
     /// <summary>職業一覧</summary>
@@ -106,6 +84,7 @@ public class GameManager : MonoBehaviour
     {
         m_addHumanPanel.GetGameManager(this);
         m_roulette.GetGameManager(this);
+        m_entryPanel.GetGameManager(this, m_first);
         m_Roads = new RoadController[5, 2, 20];
         m_first.RoadSetUp(null, m_first.RoadNumber, this);
     }
@@ -454,8 +433,6 @@ public class GameManager : MonoBehaviour
         Progress();
         m_fadePanel.gameObject.SetActive(false);
     }
-
-    //エントリーパネルで使うメソッド
     /// <summary>
     /// ゲームをスタートさせる
     /// </summary>
@@ -466,66 +443,6 @@ public class GameManager : MonoBehaviour
         m_order = 0;
         PlayerStatusBoxUpdata();
         StartCoroutine(Fade(false));
-        m_entryPanel.SetActive(false);
-    }
-    /// <summary>
-    /// エントリーさせる
-    /// </summary>
-    /// <param name="seibetu">性別</param>
-    public void AddName(bool seibetu)
-    {
-        if (m_peopleNum >= m_maxEntry)
-        {
-            if (m_coroutine != null)
-            {
-                StopCoroutine(m_coroutine);
-            }
-            m_coroutine = StartCoroutine(Caveat("最大" + m_maxEntry + "人まで！"));
-            return;
-        }
-        m_peopleNum++;
-        GameObject player = Instantiate(m_entryNamePrehab);
-        EntryNamePrefab en = player.GetComponent<EntryNamePrefab>();
-        en.Name = m_entryName.text;
-        en.Seibetu = seibetu;
-        player.transform.SetParent(m_entryNameDisplay.transform);
-        player.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-        m_entryNameDisplay.GetComponent<RectTransform>().sizeDelta = new Vector2(0, m_peopleNum * 50);
-        m_peopleNumText.text = m_peopleNum + "人";
-        if (seibetu)
-        {
-            player.GetComponent<Image>().color = m_manColor;
-        }
-        else
-        {
-            player.GetComponent<Image>().color = m_womanColor;
-        }
-    }
-    /// <summary>
-    /// エントリーを取り消す
-    /// </summary>
-    /// <param name="name">ネームプレハブ</param>
-    public void RemoveName(GameObject name)
-    {
-        m_peopleNum--;
-        Destroy(name);
-        m_peopleNumText.text = m_peopleNum + "人";
-    }
-    /// <summary>
-    /// 警告テキスト表示
-    /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    IEnumerator Caveat(string text)
-    {
-        m_caveatText.SetActive(true);
-        Text t = m_caveatText.transform.GetChild(0).GetComponent<Text>();
-        t.text = text;
-        for (float i = 0; i < 2; i += Time.deltaTime)
-        {
-            yield return null;
-        }
-        t.text = "";
-        m_caveatText.SetActive(false);
+        m_entryPanel.gameObject.SetActive(false);
     }
 }

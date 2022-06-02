@@ -31,6 +31,15 @@ public class EntryPanelController : MonoBehaviour
 
     GameManager m_gameManager;
     /// <summary>
+    /// ゲームマネージャーを受け取る
+    /// </summary>
+    /// <param name="gm">ゲームマネージャー</param>
+    public void GetGameManager(GameManager gm,RoadController road)
+    {
+        m_gameManager = gm;
+        m_first = road;
+    }
+    /// <summary>
     /// ゲームをスタートさせる
     /// </summary>
     public void GameStart()
@@ -83,8 +92,7 @@ public class EntryPanelController : MonoBehaviour
         m_peopleNum++;
         GameObject player = Instantiate(m_entryNamePrehab);
         EntryNamePrefab en = player.GetComponent<EntryNamePrefab>();
-        en.Name = m_entryName.text;
-        en.Seibetu = seibetu;
+        en.Seting(m_entryName.text, seibetu, this);
         player.transform.SetParent(m_entryNameDisplay.transform);
         player.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
         m_entryNameDisplay.GetComponent<RectTransform>().sizeDelta = new Vector2(0, m_peopleNum * 50);

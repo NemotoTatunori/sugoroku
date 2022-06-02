@@ -11,29 +11,27 @@ public class EntryNamePrefab : MonoBehaviour
     [SerializeField] bool m_seibetu;
     /// <summary>名前のテキスト</summary>
     [SerializeField] Text m_nameText = null;
+    /// <summary>エントリーパネル</summary>
+    EntryPanelController m_entryPanel;
     /// <summary>名前のプロパティ</summary>
-    public string Name
-    {
-        get => m_name;
-        set
-        {
-            m_name = value;
-            m_nameText.text = m_name;
-        }
-    }
+    public string Name => m_name;
     /// <summary>性別のプロパティ</summary>
-    public bool Seibetu
+    public bool Seibetu => m_seibetu;
+    /// <summary>
+    /// 設定する情報を受け取る
+    /// </summary>
+    /// <param name="name">名前</param>
+    /// <param name="seibetu">性別</param>
+    /// <param name="entry">エントリーパネル</param>
+    public void Seting(string name,bool seibetu,EntryPanelController entry)
     {
-        get => m_seibetu;
-        set
-        {
-            m_seibetu = value;
-        }
+        m_name = name;
+        m_nameText.text = m_name;
+        m_seibetu = seibetu;
+        m_entryPanel = entry;
     }
-
     public void Destroy()
     {
-        GameManager gm = FindObjectOfType<GameManager>();
-        gm.RemoveName(this.gameObject);
+        m_entryPanel.RemoveName(this.gameObject);
     }
 }

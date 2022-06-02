@@ -121,8 +121,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+      - m_Target: {fileID: 2535948236992515399}
+        m_TargetAssemblyTypeName: EntryPanelController, Assembly-CSharp
         m_MethodName: AddName
         m_Mode: 6
         m_Arguments:
@@ -670,8 +670,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+      - m_Target: {fileID: 2535948236992515399}
+        m_TargetAssemblyTypeName: EntryPanelController, Assembly-CSharp
         m_MethodName: AddName
         m_Mode: 6
         m_Arguments:
@@ -1074,8 +1074,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+      - m_Target: {fileID: 2535948236992515399}
+        m_TargetAssemblyTypeName: EntryPanelController, Assembly-CSharp
         m_MethodName: GameStart
         m_Mode: 1
         m_Arguments:
@@ -2428,12 +2428,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_maxEntry: 30
+  m_first: {fileID: 0}
+  m_carPrefab: {fileID: 2759004631430044209, guid: 6c9dc3c1bcd7a9545aa16f905390f512, type: 3}
   m_entryName: {fileID: 6460761530459998823}
   m_entryNamePrehab: {fileID: 9071621395797099665, guid: 799d6af9249616c4980c727b5b63da63, type: 3}
   m_entryNameDisplay: {fileID: 6460761531555820514}
   m_peopleNumText: {fileID: 6460761531768730221}
   m_caveatText: {fileID: 6460761530238551698}
-  m_entryPanel: {fileID: 0}
 --- !u!1 &6460761531518426750
 GameObject:
   m_ObjectHideFlags: 0
