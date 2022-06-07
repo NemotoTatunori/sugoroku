@@ -32,7 +32,10 @@ public enum RoadEvents
 }
 public class RoadController : MonoBehaviour
 {
-
+    /// <summary>イベントのステート</summary>
+    [SerializeField] RoadEvents m_event = RoadEvents.GetMoney;
+    /// <summary>イベントのパラメーター</summary>
+    [SerializeField] int m_eventParameter = 1000;
     /// <summary>マス番号</summary>
     [SerializeField] string m_roadNumber;
     /// <summary>マス番号表示</summary>
@@ -51,10 +54,6 @@ public class RoadController : MonoBehaviour
     [SerializeField] Text m_eventText = null;
     /// <summary>ストップマスのフラグ</summary>
     [SerializeField] bool m_stopFlag = false;
-    /// <summary>イベントのステート</summary>
-    [SerializeField] RoadEvents m_event = RoadEvents.GetMoney;
-    /// <summary>イベントのパラメーター</summary>
-    [SerializeField] int m_eventParameter = 1000;
     /// <summary>マスの色を表示する</summary>
     [SerializeField] GameObject m_roadColorDisplay = null;
     /// <summary>マスの色候補</summary>

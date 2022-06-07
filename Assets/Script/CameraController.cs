@@ -5,7 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     Rigidbody m_rb = null;
-    bool m_move = true;
+    bool m_move = false;
     [SerializeField] float m_moveSpeed = 10f;
     [SerializeField] float m_turnSpeed = 10f;
     public bool Move

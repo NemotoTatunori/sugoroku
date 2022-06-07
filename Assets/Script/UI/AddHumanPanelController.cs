@@ -47,7 +47,7 @@ public class AddHumanPanelController : MonoBehaviour
     /// <param name="p">ÉpÉ^Å[Éì</param>
     public void AddHumanButton(int p)
     {
-        m_gameManager.AddHumanEvent(p,m_nameText.text);
+        m_gameManager.AddHumanEvent(p, m_nameText.text);
         gameObject.SetActive(false);
     }
     /// <summary>
