@@ -180,6 +180,7 @@ public class PlayerController : MonoBehaviour
             if (!reverse)
             {
                 nextPint = m_location.NextRoad(m_branchNumber);
+                transform.LookAt(nextPint.transform.position);
             }
             else
             {

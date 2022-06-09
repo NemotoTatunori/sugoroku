@@ -58,7 +58,7 @@ public class RoadController : MonoBehaviour
     [SerializeField] GameObject m_roadColorDisplay = null;
     /// <summary>マスの色候補</summary>
     [SerializeField] Material[] m_roadColors = null;
-    /// <summary>位置補正のフラグ</summary>
+    /// <summary>設定済のフラグ</summary>
     bool m_positionCorrection = false;
     /// <summary>ゲームマネージャー</summary>
     protected GameManager m_gameManager;
@@ -74,7 +74,7 @@ public class RoadController : MonoBehaviour
             m_roadNumberText.text = m_roadNumber;
         }
     }
-    /// <summary>位置補正のプロパティ</summary>
+    /// <summary>設定済フラグのプロパティ</summary>
     public bool PositionCorrection => m_positionCorrection;
     /// <summary>ストップマスのプロパティ</summary>
     public bool StopFlag => m_stopFlag;
@@ -82,6 +82,7 @@ public class RoadController : MonoBehaviour
     public Transform StopPint => m_stopPoint;
     /// <summary>一つ前のマスのプロパティ</summary>
     public RoadController PrevRoad => m_prevRoads[0];
+    /// <summary>次のマスのプロパティ</summary>
     public RoadController[] NextRoads => m_nextRoads;
     /// <summary>イベントのプロパティ</summary>
     public RoadEvents Event => m_event;
@@ -104,12 +105,16 @@ public class RoadController : MonoBehaviour
     /// </summary>
     public virtual void RoadSetUp(RoadController road, string rn, GameManager gameManager)
     {
+        PrevRoadSet(road);
+        if (m_positionCorrection)
+        {
+            return;
+        }
         m_gameManager = gameManager;
         if (RoadNumber == "")
         {
             RoadNumber = rn;
         }
-        PrevRoadSet(road);
         //次のマスに情報を送る
         if (m_nextRoads.Length == 0)
         {
@@ -124,6 +129,7 @@ public class RoadController : MonoBehaviour
         }
         m_gameManager.GetRoads(this);
         m_nextRoads[0].RoadSetUp(this, NextNumber(RoadNumber, 0), gameManager);
+        m_positionCorrection = true;
     }
     /// <summary>
     /// 一つ前のマスを登録する
@@ -178,7 +184,6 @@ public class RoadController : MonoBehaviour
     /// </summary>
     public void PositionSetUp(Vector3 p)
     {
-        m_positionCorrection = true;
         this.transform.position = p;
     }
     /// <summary>
@@ -193,7 +198,6 @@ public class RoadController : MonoBehaviour
         }
         return m_nextRoads[0];
     }
-
     /// <summary>
     /// マスのイベントテキストを返す
     /// </summary>
@@ -215,6 +219,4 @@ public class RoadController : MonoBehaviour
         }
         return AText;
     }
-
-
 }
