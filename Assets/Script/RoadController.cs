@@ -82,6 +82,7 @@ public class RoadController : MonoBehaviour
     public Transform StopPint => m_stopPoint;
     /// <summary>一つ前のマスのプロパティ</summary>
     public RoadController PrevRoad => m_prevRoads[0];
+    public RoadController[] NextRoads => m_nextRoads;
     /// <summary>イベントのプロパティ</summary>
     public RoadEvents Event => m_event;
     /// <summary>イベントパラメーターのプロパティ</summary>

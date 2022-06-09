@@ -157,7 +157,7 @@ public class GameManager : MonoBehaviour
                 m_gamePanel.ProgressText.SetActive(false);
                 m_state = ProgressState.Roulette;
                 m_roulette.gameObject.SetActive(true);
-                m_roulette.RouletteStart();
+                m_roulette.RouletteStart(true);
                 break;
             case ProgressState.Roulette:
                 m_state = ProgressState.PlayerMove;
@@ -347,10 +347,19 @@ public class GameManager : MonoBehaviour
     /// <returns></returns>
     IEnumerator Branch(PlayerController player)
     {
+        int r = player.Location.NextRoads.Length;
         m_roulette.gameObject.SetActive(true);
-        int[] lineup = { 0, 1 };
-        m_roulette.GetLineup(lineup);
-        yield return m_roulette.RouletteStart();
+        string[] lineup;
+        if (r == 2)
+        {
+            lineup = new string[] { "ç∂", "âE" };
+        }
+        else
+        {
+            lineup = new string[] { "ç∂", "ê^íÜ", "âE" };
+        }
+        m_roulette.GetBranchRoadLineup(lineup);
+        yield return m_roulette.RouletteStart(false);
         player.BranchNumber = m_roulette.Number;
     }
     /// <summary>

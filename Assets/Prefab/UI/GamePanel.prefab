@@ -803,8 +803,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+      - m_Target: {fileID: 4804056324057769909}
+        m_TargetAssemblyTypeName: GamePanelController, Assembly-CSharp
         m_MethodName: FindWorkMove
         m_Mode: 6
         m_Arguments:
@@ -3671,8 +3671,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+      - m_Target: {fileID: 4804056324057769909}
+        m_TargetAssemblyTypeName: GamePanelController, Assembly-CSharp
         m_MethodName: FindWorkMove
         m_Mode: 6
         m_Arguments:
