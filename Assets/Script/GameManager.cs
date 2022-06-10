@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] EntryPanelController m_entryPanel = null;
     /// <summary>ゲームパネル</summary>
     [SerializeField] GamePanelController m_gamePanel = null;
+    /// <summary>ゲームオーバーパネル</summary>
+    [SerializeField] GameOverPanelController m_gameOverPanel = null;
     /// <summary>職業一覧</summary>
     string[] m_professions = { "フリーター", "スポーツ選手", "プログラマー", "パティシエ", "料理人", "大工" };
     /// <summary>給料一覧</summary>
@@ -51,10 +53,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject m_carPrefab = null;
     /// <summary>プレイヤーたちの情報</summary>
     PlayerController[] m_players = null;
+    /// <summary>ゴールした人たちの金額順位</summary>
+    PlayerController[] m_goalRanking = null;
     /// <summary>マスの配列</summary>
     RoadController[,,] m_Roads;
     /// <summary>手番を管理する</summary>
     int m_order = 0;
+    /// <summary>現在手番のプレイヤー</summary>
+    PlayerController m_orderPlayer;
     /// <summary>ルーレット</summary>
     RouletteController m_roulette = null;
     /// <summary>ルーレットのデフォルト数</summary>
@@ -90,37 +96,25 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void TurnChange()
     {
-        bool ag = true;
-        foreach (var item in m_players)
+        if (!(m_players.Length <= m_goalNumber))
         {
-            if (!item.Goal)
+            if (true)
             {
-                ag = false;
-                break;
+                m_order++;
             }
-        }
-        if (!ag)
-        {
-            m_order++;
-            if (m_order >= m_players.Length)
+            if (m_order >= m_players.Length - m_goalNumber)
             {
                 m_order = 0;
             }
-            if (m_players[m_order].Goal)
-            {
-                TurnChange();
-            }
-            else
-            {
-                m_roulette.GetLineup(m_rouletteLineupDefault);
-                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_professions);
-                Progress();
-            }
+            m_orderPlayer = m_players[m_order];
+            m_roulette.GetLineup(m_rouletteLineupDefault);
+            m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_professions);
+            Progress();
         }
         else
         {
             Debug.Log("全員ゴールした");
-            //全員ゴールした時の処理を書く
+            m_gameOverPanel.GetPlayers(m_goalRanking);
         }
     }
     /// <summary>
@@ -141,16 +135,16 @@ public class GameManager : MonoBehaviour
         switch (m_state)
         {
             case ProgressState.FadeIn:
-                if (!m_players[m_order].Rest)
+                if (!m_orderPlayer.Rest)
                 {
                     m_state = ProgressState.TurnText;
-                    m_gamePanel.TextDisplay(m_players[m_order].Owner.Name + "さんの番です");
+                    m_gamePanel.TextDisplay(m_orderPlayer.Owner.Name + "さんの番です");
                 }
                 else
                 {
                     m_state = ProgressState.TurnEnd;
-                    m_gamePanel.TextDisplay(m_players[m_order].Owner.Name + "さんはお休みのようです");
-                    m_players[m_order].Rest = false;
+                    m_gamePanel.TextDisplay(m_orderPlayer.Owner.Name + "さんはお休みのようです");
+                    m_orderPlayer.Rest = false;
                 }
                 break;
             case ProgressState.TurnText:
@@ -161,16 +155,16 @@ public class GameManager : MonoBehaviour
                 break;
             case ProgressState.Roulette:
                 m_state = ProgressState.PlayerMove;
-                m_players[m_order].MoveStart(m_roulette.Number, false, false, m_camera);
+                m_orderPlayer.MoveStart(m_roulette.Number, false, false, m_camera);
                 break;
             case ProgressState.PlayerMove:
                 m_state = ProgressState.RoadText;
-                m_gamePanel.TextDisplay(m_players[m_order].Location.EventText());
+                m_gamePanel.TextDisplay(m_orderPlayer.Location.EventText());
                 break;
             case ProgressState.RoadText:
                 m_gamePanel.ProgressText.SetActive(false);
                 m_state = ProgressState.Event;
-                RoadEvent(m_players[m_order]);
+                RoadEvent(m_orderPlayer);
                 break;
             case ProgressState.Event:
                 m_state = ProgressState.TurnEnd;
@@ -185,16 +179,14 @@ public class GameManager : MonoBehaviour
                 break;
             case ProgressState.FadeOut:
                 m_state = ProgressState.PlayerCheck;
-                PlayerController p = m_players[m_order];
-                if (p.PaydayFlag)
+                if (m_orderPlayer.PaydayFlag)
                 {
-                    p.GetMoney(Salary(p.Profession, p.SalaryRank));
-                    p.PaydayFlag = false;
+                    m_orderPlayer.GetMoney(Salary(m_orderPlayer.Profession, m_orderPlayer.SalaryRank));
+                    m_orderPlayer.PaydayFlag = false;
                 }
                 TurnChange();
-                p = m_players[m_order];
-                p.transform.position = p.Location.StopPint.position;
-                m_camera.PositionSet(p.transform.position);
+                m_orderPlayer.transform.position = m_orderPlayer.Location.StopPint.position;
+                m_camera.PositionSet(m_orderPlayer.transform.position);
                 m_camera.Move = false;
                 break;
             case ProgressState.PlayerCheck:
@@ -261,10 +253,41 @@ public class GameManager : MonoBehaviour
                 int bonus = m_goalBonus - m_goalNumber * 10000;
                 player.Goal = true;
                 player.GetMoney(bonus);
+                m_goalRanking[m_goalNumber] = player;
                 m_goalNumber++;
                 m_gamePanel.TextDisplay(player.Owner.Name + "が" + m_goalNumber + "位でゴールした！\n賞金として" + bonus + "もらった！");
                 m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
+                PlayersSort(player);
                 break;
+        }
+    }
+    /// <summary>
+    /// ゴールした際に手番と順位をソートする
+    /// </summary>
+    /// <param name="player">ゴールしたプレイヤー</param>
+    void PlayersSort(PlayerController player)
+    {
+        for (int i = m_order; i < m_players.Length - m_goalNumber; i++)
+        {
+            Debug.Log(i + 1);
+            m_players[i] = m_players[i + 1];
+        }
+        m_players[m_players.Length - m_goalNumber] = player;
+        for (int i = m_goalNumber - 1; i > 0; i--)
+        {
+            if (m_goalRanking[i].Money > m_goalRanking[i - 1].Money)
+            {
+                m_goalRanking[i] = m_goalRanking[i - 1];
+                m_goalRanking[i - 1] = player;
+            }
+            else
+            {
+                break;
+            }
+        }
+        for (int i = 0; i < m_goalNumber; i++)
+        {
+            Debug.Log($"{m_goalRanking[i].Owner.Name}さんは{m_goalRanking[i].Money}円持っているため{i + 1}位");
         }
     }
     /// <summary>
@@ -403,8 +426,10 @@ public class GameManager : MonoBehaviour
     public void GameStart(PlayerController[] players)
     {
         m_players = players;
+        m_goalRanking = new PlayerController[m_players.Length];
         m_state = ProgressState.PlayerCheck;
         m_order = 0;
+        m_orderPlayer = m_players[m_order];
         m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_professions);
         StartCoroutine(Fade(false));
         m_entryPanel.gameObject.SetActive(false);
