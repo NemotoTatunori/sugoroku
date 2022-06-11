@@ -15,15 +15,26 @@ public abstract class BranchCellBase : CellBase
     }
     public override bool Event()
     {
-        if (m_event == null)
+        PlayerData player = MapManager.Instance.m_player;
+
+        if (!player.CellData.m_isBranch)
         {
-            m_event = m_eventSavers[BranchEvent(m_eventSavers.Count)];
-            Debug.Log($"EventSaverName :{m_event.gameObject.name}");
+            player.CellData.m_isBranch = true;
+            player.CellData.m_branchId = BranchEvent(m_eventSavers.Count);
+            player.CellData.m_eventId = 0;
             return false;
         }
         else
         {
-            return m_event.Callback();
+            if (m_event.Callback())
+            {
+                player.CellData.m_isBranch = false;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
     protected abstract int BranchEvent(int branchCount);
