@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class EntryPanelController : MonoBehaviour
 {
     Coroutine m_coroutine;
@@ -15,7 +14,7 @@ public class EntryPanelController : MonoBehaviour
     /// <summary>参加する人の名前を入力する場所</summary>
     [SerializeField] Text m_entryName = null;
     /// <summary>参加する人の名前を表示するプレハブ</summary>
-    [SerializeField] GameObject m_entryNamePrehab = null;
+    [SerializeField] EntryNamePrefab m_entryNamePrehab = null;
     /// <summary>参加する人の名前を表示する場所</summary>
     [SerializeField] GameObject m_entryNameDisplay = null;
     /// <summary>参加数のテキスト</summary>
@@ -29,12 +28,13 @@ public class EntryPanelController : MonoBehaviour
     /// <summary>女の色（ピンク）</summary>
     Color m_womanColor = new Color(1, 0.6f, 1);
 
+
     GameManager m_gameManager;
     /// <summary>
     /// ゲームマネージャーを受け取る
     /// </summary>
     /// <param name="gm">ゲームマネージャー</param>
-    public void GetGameManager(GameManager gm,RoadController road)
+    public void GetGameManager(GameManager gm, RoadController road)
     {
         m_gameManager = gm;
         m_first = road;
@@ -63,6 +63,9 @@ public class EntryPanelController : MonoBehaviour
             GameObject car = Instantiate(m_carPrefab);
             car.transform.position = new Vector3(px + x * 5, 0, z * -10);
             players[i] = car.GetComponent<PlayerController>();
+            // note. MapManagerに自信を登録することを過程
+            // MapmManager.Instance.AppPlayer(自身);
+
             EntryNamePrefab en = m_entryNameDisplay.transform.GetChild(i).GetComponent<EntryNamePrefab>();
             players[i].Seting(en.Seibetu, en.Name, m_first, m_gameManager);
             x++;
@@ -90,20 +93,19 @@ public class EntryPanelController : MonoBehaviour
             return;
         }
         m_peopleNum++;
-        GameObject player = Instantiate(m_entryNamePrehab);
-        EntryNamePrefab en = player.GetComponent<EntryNamePrefab>();
-        en.Seting(m_entryName.text, seibetu, this);
-        player.transform.SetParent(m_entryNameDisplay.transform);
-        player.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+        EntryNamePrefab en = Instantiate(m_entryNamePrehab);
+        en.Seting(m_entryName.text, seibetu, RemoveName);
+        en.transform.SetParent(m_entryNameDisplay.transform);
+        en.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
         m_entryNameDisplay.GetComponent<RectTransform>().sizeDelta = new Vector2(0, m_peopleNum * 50);
         m_peopleNumText.text = m_peopleNum + "人";
         if (seibetu)
         {
-            player.GetComponent<Image>().color = m_manColor;
+            en.GetComponent<Image>().color = m_manColor;
         }
         else
         {
-            player.GetComponent<Image>().color = m_womanColor;
+            en.GetComponent<Image>().color = m_womanColor;
         }
     }
     /// <summary>

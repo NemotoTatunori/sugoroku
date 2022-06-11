@@ -2431,7 +2431,7 @@ MonoBehaviour:
   m_first: {fileID: 0}
   m_carPrefab: {fileID: 2759004631430044209, guid: 6c9dc3c1bcd7a9545aa16f905390f512, type: 3}
   m_entryName: {fileID: 6460761530459998823}
-  m_entryNamePrehab: {fileID: 9071621395797099665, guid: 799d6af9249616c4980c727b5b63da63, type: 3}
+  m_entryNamePrehab: {fileID: 1215651595510906698, guid: 799d6af9249616c4980c727b5b63da63, type: 3}
   m_entryNameDisplay: {fileID: 6460761531555820514}
   m_peopleNumText: {fileID: 6460761531768730221}
   m_caveatText: {fileID: 6460761530238551698}
