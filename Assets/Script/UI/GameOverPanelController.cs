@@ -36,7 +36,7 @@ public class GameOverPanelController : MonoBehaviour
             RankingPlatePrefab p = Instantiate(m_rankingPlatePrefab, transform);
             p.GetComponent<Image>().color = m_rankingColoer[i];
             p.GetComponent<RectTransform>().position = m_point[i].position;
-            p.GetComponent<RectTransform>().localScale = new Vector2(1.5f, 1.5f);
+            p.GetComponent<RectTransform>().localScale = new Vector2(2f, 2f);
             p.Seting(i + 1, m_players[i]);
         }
         for (int i = 3; i < m_players.Length; i++)
