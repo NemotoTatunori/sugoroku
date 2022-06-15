@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    /// <summary>プレイヤーの名前</summary>
+    /// <summary>主人の情報</summary>
     [SerializeField] Human m_owner = null;
     /// <summary>職業</summary>
     [SerializeField] int m_profession = 0;
@@ -40,10 +40,14 @@ public class PlayerController : MonoBehaviour
     int m_branchNumber = 0;
     /// <summary>ゴールのフラグ</summary>
     bool m_goal = false;
-    /// <summary>名前のプロパティ</summary>
+    /// <summary>主人のプロパティ</summary>
     public Human Owner => m_owner;
     /// <summary>所持金のプロパティ</summary>
     public int Money => m_money;
+    /// <summary>乗っている人数のプロパティ</summary>
+    public int FamilyNum => m_familyNum;
+    /// <summary>乗っている人たちのプロパティ</summary>
+    public Human[] Family => m_family;
     /// <summary>現在位置のプロパティ</summary>
     public RoadController Location
     {

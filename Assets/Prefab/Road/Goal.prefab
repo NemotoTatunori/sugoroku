@@ -225,7 +225,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_event: 11
   m_eventParameter: 100000
-  m_roadNumber: 0-0-0
+  m_roadNumber: 
   m_roadNumberText: {fileID: 6268449208234633000}
   m_stopPoint: {fileID: 6268449206807938870}
   m_nextConnect: []

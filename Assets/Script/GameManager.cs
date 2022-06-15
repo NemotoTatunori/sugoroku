@@ -49,8 +49,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] CameraController m_camera = null;
     /// <summary>最初のマス</summary>
     [SerializeField] RoadController m_first = null;
-    /// <summary>車のプレハブ</summary>
-    [SerializeField] GameObject m_carPrefab = null;
     /// <summary>プレイヤーたちの情報</summary>
     PlayerController[] m_players = null;
     /// <summary>ゴールした人たちの金額順位</summary>
@@ -430,6 +428,7 @@ public class GameManager : MonoBehaviour
         m_state = ProgressState.PlayerCheck;
         m_order = 0;
         m_orderPlayer = m_players[m_order];
+        m_orderPlayer.transform.position = m_first.StopPint.position;
         m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_professions);
         StartCoroutine(Fade(false));
         m_entryPanel.gameObject.SetActive(false);

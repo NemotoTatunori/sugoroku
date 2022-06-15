@@ -13,15 +13,13 @@ public class GameOverPanelController : MonoBehaviour
     PlayerController[] m_players;
     /// <summary>１，２，３位の配置配列</summary>
     [SerializeField] RectTransform[] m_point = null;
+    /// <summary>詳細パネル</summary>
+    [SerializeField] DetailPanelController m_detailPanel = null;
     /// <summary>１，２，３位の色配列</summary>
     Color[] m_rankingColoer = {
         new Color(1f, 0.84f, 0),
         new Color(0.862f, 0.866f, 0.866f),
         new Color(0.768f, 0.439f, 0.133f) };
-    void Start()
-    {
-
-    }
     public void GetPlayers(PlayerController[] ps)
     {
         gameObject.SetActive(true);
@@ -37,12 +35,12 @@ public class GameOverPanelController : MonoBehaviour
             p.GetComponent<Image>().color = m_rankingColoer[i];
             p.GetComponent<RectTransform>().position = m_point[i].position;
             p.GetComponent<RectTransform>().localScale = new Vector2(2f, 2f);
-            p.Seting(i + 1, m_players[i]);
+            //p.Seting(i + 1, m_players[i],);
         }
         for (int i = 3; i < m_players.Length; i++)
         {
             RankingPlatePrefab p = Instantiate(m_rankingPlatePrefab, m_rankingList.transform);
-            p.Seting(i + 1, m_players[i]);
+            //p.Seting(i + 1, m_players[i],);
         }
     }
 }
