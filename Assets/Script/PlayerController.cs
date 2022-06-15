@@ -173,6 +173,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     /// <param name="m">進む数</param>
     /// <param name="reverse">進む方向</param>
+    /// /// <param name="e">イベントフラグ</param>
+    /// /// <param name="c">カメラ</param>
     /// <returns></returns>
     IEnumerator Move(int m, bool reverse, bool e, CameraController c)
     {

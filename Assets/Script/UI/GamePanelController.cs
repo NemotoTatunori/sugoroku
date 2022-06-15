@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class GamePanelController : MonoBehaviour
 {
@@ -15,6 +16,10 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] AddHumanPanelController m_addHumanPanel = null;
     /// <summary>就職パネルのテキスト</summary>
     [SerializeField] Text m_findWorkPanel = null;
+    /// <summary>プレイヤーボタンリスト</summary>
+    [SerializeField] GameObject m_playerJumpButtonList = null;
+    /// <summary>プレイヤーボタン</summary>
+    [SerializeField] PlayerJumpButton m_playerJumpButtonPrefab = null;
     /// <summary>ターンエンドボタン</summary>
     [SerializeField] GameObject m_turnEndButton = null;
     GameManager m_gameManager;
@@ -28,7 +33,27 @@ public class GamePanelController : MonoBehaviour
     public GameObject ProgressText => m_progressText.transform.parent.gameObject;
     /// <summary>ターンエンドボタンのプロパティ</summary>
     public GameObject TurnEndButton => m_turnEndButton;
-
+    /// <summary>プレイヤーボタンリストのプロパティ</summary>
+    public GameObject PlayerJumpButtonList => m_playerJumpButtonList;
+    /// <summary>
+    /// プレイヤージャンプボタン生成
+    /// </summary>
+    /// <param name="players">プレイヤー配列</param>
+    /// <param name="action">関数</param>
+    public void GetPlayer(PlayerController[] players, Action<Vector3> action)
+    {
+        GameObject list = m_playerJumpButtonList.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject;
+        list.GetComponent<RectTransform>().sizeDelta = new Vector2(0, players.Length * 50);
+        for (int i = 0; i < players.Length; i++)
+        {
+            PlayerJumpButton pb = Instantiate(m_playerJumpButtonPrefab, list.transform);
+            pb.Setting(players[i], action);
+        }
+    }
+    /// <summary>
+    /// ゲームマネージャーの情報を受け取る
+    /// </summary>
+    /// <param name="gm">ゲームマネージャー</param>
     public void GetGameManager(GameManager gm)
     {
         m_gameManager = gm;

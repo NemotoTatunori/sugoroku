@@ -166,11 +166,13 @@ public class GameManager : MonoBehaviour
                 break;
             case ProgressState.Event:
                 m_state = ProgressState.TurnEnd;
+                m_gamePanel.PlayerJumpButtonList.SetActive(true);
                 m_gamePanel.ProgressText.SetActive(false);
                 m_camera.Move = true;
                 m_gamePanel.TurnEndButton.SetActive(true);
                 break;
             case ProgressState.TurnEnd:
+                m_gamePanel.PlayerJumpButtonList.SetActive(false);
                 m_gamePanel.TurnEndButton.SetActive(false);
                 m_state = ProgressState.FadeOut;
                 StartCoroutine(Fade(false));
@@ -420,6 +422,11 @@ public class GameManager : MonoBehaviour
         Progress();
         m_fadePanel.gameObject.SetActive(false);
     }
+
+    void CameraJump(Vector3 point)
+    {
+        m_camera.PositionSet(point);
+    }
     /// <summary>
     /// ゲームをスタートさせる
     /// </summary>
@@ -434,5 +441,7 @@ public class GameManager : MonoBehaviour
         m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_professions);
         StartCoroutine(Fade(false));
         m_entryPanel.gameObject.SetActive(false);
+        m_gamePanel.gameObject.SetActive(true);
+        m_gamePanel.GetPlayer(m_players, CameraJump);
     }
 }

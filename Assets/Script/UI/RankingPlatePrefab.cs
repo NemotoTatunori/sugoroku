@@ -14,6 +14,7 @@ public class RankingPlatePrefab : MonoBehaviour
     [SerializeField] Text m_rankingText;
     /// <summary>名前表示のテキスト</summary>
     [SerializeField] Text m_nameText;
+    /// <summary>詳細画面を呼ぶ関数</summary>
     Action<PlayerController> m_detail;
     /// <summary>
     /// 情報を受け取って設定する
