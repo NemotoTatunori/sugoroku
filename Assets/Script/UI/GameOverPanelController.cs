@@ -20,27 +20,34 @@ public class GameOverPanelController : MonoBehaviour
         new Color(1f, 0.84f, 0),
         new Color(0.862f, 0.866f, 0.866f),
         new Color(0.768f, 0.439f, 0.133f) };
+    /// <summary>
+    /// パネルを表示し、プレイヤー配列を受け取る
+    /// </summary>
+    /// <param name="ps">プレイヤー配列</param>
     public void GetPlayers(PlayerController[] ps)
     {
         gameObject.SetActive(true);
         m_players = ps;
         RankingStart();
     }
+    /// <summary>
+    /// ランキング作成
+    /// </summary>
     void RankingStart()
     {
         int loop = m_players.Length > 3 ? 3 : m_players.Length;
         for (int i = 0; i < loop; i++)
         {
-            RankingPlatePrefab p = Instantiate(m_rankingPlatePrefab, transform);
+            RankingPlatePrefab p = Instantiate(m_rankingPlatePrefab, m_point[i]);
             p.GetComponent<Image>().color = m_rankingColoer[i];
-            p.GetComponent<RectTransform>().position = m_point[i].position;
+            p.GetComponent<RectTransform>().transform.position = m_point[i].position;
             p.GetComponent<RectTransform>().localScale = new Vector2(2f, 2f);
-            //p.Seting(i + 1, m_players[i],);
+            p.Seting(i + 1, m_players[i],m_detailPanel.Setting);
         }
         for (int i = 3; i < m_players.Length; i++)
         {
             RankingPlatePrefab p = Instantiate(m_rankingPlatePrefab, m_rankingList.transform);
-            //p.Seting(i + 1, m_players[i],);
+            p.Seting(i + 1, m_players[i], m_detailPanel.Setting);
         }
     }
 }

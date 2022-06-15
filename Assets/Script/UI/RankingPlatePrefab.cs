@@ -14,13 +14,13 @@ public class RankingPlatePrefab : MonoBehaviour
     [SerializeField] Text m_rankingText;
     /// <summary>名前表示のテキスト</summary>
     [SerializeField] Text m_nameText;
-    Action m_detail;
+    Action<PlayerController> m_detail;
     /// <summary>
     /// 情報を受け取って設定する
     /// </summary>
     /// <param name="r">順位</param>
     /// <param name="p">プレイヤー</param>
-    public void Seting(int r,PlayerController p,Action a)
+    public void Seting(int r,PlayerController p,Action<PlayerController> a)
     {
         m_ranking = r;
         m_player = p;
@@ -30,7 +30,6 @@ public class RankingPlatePrefab : MonoBehaviour
     }
     public void DetailButton()
     {
-        m_detail();
-        Debug.Log($"{m_player.Owner.Name}は{m_player.Money}円持っている");
+        m_detail.Invoke(m_player);
     }
 }

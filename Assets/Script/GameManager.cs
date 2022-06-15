@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
     {
         if (!(m_players.Length <= m_goalNumber))
         {
-            if (true)
+            if (!m_orderPlayer.Goal)
             {
                 m_order++;
             }
@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("全員ゴールした");
+            m_gamePanel.gameObject.SetActive(false);
             m_gameOverPanel.GetPlayers(m_goalRanking);
         }
     }
@@ -250,10 +250,17 @@ public class GameManager : MonoBehaviour
             case RoadEvents.Goal:
                 int bonus = m_goalBonus - m_goalNumber * 10000;
                 player.Goal = true;
-                player.GetMoney(bonus);
                 m_goalRanking[m_goalNumber] = player;
                 m_goalNumber++;
-                m_gamePanel.TextDisplay(player.Owner.Name + "が" + m_goalNumber + "位でゴールした！\n賞金として" + bonus + "もらった！");
+                if (bonus > 0)
+                {
+                    player.GetMoney(bonus);
+                    m_gamePanel.TextDisplay(player.Owner.Name + "が" + m_goalNumber + "位でゴールした！\n賞金として" + bonus + "もらった！");
+                }
+                else
+                {
+                    m_gamePanel.TextDisplay(player.Owner.Name + "が" + m_goalNumber + "位でゴールした！\n賞金はもらえなかった・・・");
+                }
                 m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
                 PlayersSort(player);
                 break;
@@ -267,7 +274,6 @@ public class GameManager : MonoBehaviour
     {
         for (int i = m_order; i < m_players.Length - m_goalNumber; i++)
         {
-            Debug.Log(i + 1);
             m_players[i] = m_players[i + 1];
         }
         m_players[m_players.Length - m_goalNumber] = player;
@@ -282,10 +288,6 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-        }
-        for (int i = 0; i < m_goalNumber; i++)
-        {
-            Debug.Log($"{m_goalRanking[i].Owner.Name}さんは{m_goalRanking[i].Money}円持っているため{i + 1}位");
         }
     }
     /// <summary>
