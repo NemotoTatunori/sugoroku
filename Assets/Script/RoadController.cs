@@ -27,8 +27,10 @@ public enum RoadEvents
     RoadBranch = 9,
     /// <summary>è∏ãã</summary>
     PayRaise = 10,
+    /// <summary>ç~ãã</summary>
+    ReductionInPay = 11,
     /// <summary>ÉSÅ[Éã</summary>
-    Goal = 11,
+    Goal = 12,
 }
 public class RoadController : MonoBehaviour
 {

@@ -36,13 +36,28 @@ public class GameManager : MonoBehaviour
     /// <summary>ゲームオーバーパネル</summary>
     [SerializeField] GameOverPanelController m_gameOverPanel = null;
     /// <summary>職業一覧</summary>
-    string[] m_professions = { "フリーター", "スポーツ選手", "プログラマー", "パティシエ", "料理人", "大工" };
+    string[] m_professions = {
+        "フリーター", "プログラマー", "大工","フグ", "お笑い芸人のサポーター",
+        "Googleの社員","キャップ職人","なんかめっちゃ社会貢献してる人","漁師","絵師",
+        "パティシエ","アニメとかでボコボコにされる人","アルプスの少女","めっちゃ論破する人","社会不適合者",
+        "料理人","バッククロージャー職人 極","バッククロージャー職人 剣","バッククロージャー職人 獄","バッククロージャー職人 ゴッド"
+    };
     /// <summary>給料一覧</summary>
-    int[,] m_salarys = {
-        {5000, 10000, 11000, 12000, 13000, 14000 },
-        {10000, 30000, 29000, 28000, 27000, 26000 } };
+    int[] m_salarys = {
+        100000,200000,220000,400000,400000,
+        500000,100000,250000,150000,300000,
+        230000,280000,140000,320000,230000,
+        300000,350000,400000,600000
+    };
+    /// <summary>給料昇給倍率</summary>
+    float[] m_magnification = {
+        0.5f,0.5f,0.5f,0.5f,0.5f,
+        0.5f,0.5f,0.5f,0.5f,0.5f,
+        0.5f,0.5f,0.5f,0.5f,0.5f,
+        0.5f,0.5f,0.5f,0.5f
+    };
     /// <summary>ゴールした時のボーナス</summary>
-    int m_goalBonus = 100000;
+    int m_goalBonus = 1000000;
     /// <summary>ゴールした人数</summary>
     int m_goalNumber = 0;
     /// <summary>カメラ</summary>
@@ -121,9 +136,12 @@ public class GameManager : MonoBehaviour
     /// <param name="profession">職業</param>
     /// <param name="salaryRank">ランク</param>
     /// <returns>給料</returns>
-    int Salary(int profession, int salaryRank)
+    int Salary(PlayerController player)
     {
-        return m_salarys[salaryRank, profession];
+        float salaryOriginal = (float)m_salarys[player.Profession];
+        float magnification = m_magnification[player.Profession];
+        int salary =(int)salaryOriginal + (int)(magnification * player.SalaryRank);
+        return salary;
     }
     /// <summary>
     /// ゲーム進行のステート管理
@@ -181,7 +199,7 @@ public class GameManager : MonoBehaviour
                 m_state = ProgressState.PlayerCheck;
                 if (m_orderPlayer.PaydayFlag)
                 {
-                    m_orderPlayer.GetMoney(Salary(m_orderPlayer.Profession, m_orderPlayer.SalaryRank));
+                    m_orderPlayer.GetMoney(Salary(m_orderPlayer));
                     m_orderPlayer.PaydayFlag = false;
                 }
                 TurnChange();
@@ -228,8 +246,8 @@ public class GameManager : MonoBehaviour
                 m_gamePanel.FindWorkText(m_professions[road.EventParameter]);
                 break;
             case RoadEvents.Payday:
-                player.GetMoney(Salary(player.Profession, player.SalaryRank));
-                m_gamePanel.TextDisplay(player.Owner.Name + "さんは給料として" + m_salarys[player.SalaryRank, player.Profession] + "得た！");
+                player.GetMoney(Salary(m_orderPlayer));
+                m_gamePanel.TextDisplay(player.Owner.Name + "さんは給料として" + Salary(m_orderPlayer) + "得た！");
                 m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
                 player.PaydayFlag = false;
                 break;
@@ -249,8 +267,20 @@ public class GameManager : MonoBehaviour
                 m_gamePanel.TextDisplay(player.Owner.Name + "さんの給料ランクが上がった！");
                 m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
                 break;
+            case RoadEvents.ReductionInPay:
+                if (player.SalaryRank <= 0)
+                {
+                    player.SalaryRank = player.SalaryRank - 1;
+                    m_gamePanel.TextDisplay(player.Owner.Name + "さんの給料ランクが下がった・・・");
+                    m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
+                }
+                else
+                {
+                    m_gamePanel.TextDisplay(player.Owner.Name + "さんの給料ランクはこれ以上下がらない");
+                }
+                break;
             case RoadEvents.Goal:
-                int bonus = m_goalBonus - m_goalNumber * 10000;
+                int bonus = m_goalBonus - m_goalNumber * 100000;
                 player.Goal = true;
                 m_goalRanking[m_goalNumber] = player;
                 m_goalNumber++;
@@ -443,5 +473,6 @@ public class GameManager : MonoBehaviour
         m_entryPanel.gameObject.SetActive(false);
         m_gamePanel.gameObject.SetActive(true);
         m_gamePanel.GetPlayer(m_players, CameraJump);
+        Debug.Log(Salary(m_orderPlayer));
     }
 }
