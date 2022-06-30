@@ -46,15 +46,16 @@ public class GameManager : MonoBehaviour
     int[] m_salarys = {
         100000,200000,220000,400000,400000,
         500000,100000,250000,150000,300000,
-        230000,280000,140000,320000,230000,
-        300000,350000,400000,600000
+        230000,280000,140000,320000,10000,
+        230000,300000,350000,400000,600000
+        
     };
     /// <summary>給料昇給倍率</summary>
     float[] m_magnification = {
-        0.5f,0.5f,0.5f,0.5f,0.5f,
-        0.5f,0.5f,0.5f,0.5f,0.5f,
-        0.5f,0.5f,0.5f,0.5f,0.5f,
-        0.5f,0.5f,0.5f,0.5f
+        0.2f,0.2f,0.2f,0.2f,0.2f,
+        0.2f,0.2f,0.2f,0.2f,0.2f,
+        0.2f,0.2f,0.2f,0.2f,0.2f,
+        0.2f,0.2f,0.2f,0.2f
     };
     /// <summary>ゴールした時のボーナス</summary>
     int m_goalBonus = 1000000;
@@ -140,7 +141,7 @@ public class GameManager : MonoBehaviour
     {
         float salaryOriginal = (float)m_salarys[player.Profession];
         float magnification = m_magnification[player.Profession];
-        int salary =(int)salaryOriginal + (int)(magnification * player.SalaryRank);
+        int salary =(int)salaryOriginal + (int)(salaryOriginal * magnification * player.SalaryRank);
         return salary;
     }
     /// <summary>
@@ -473,6 +474,5 @@ public class GameManager : MonoBehaviour
         m_entryPanel.gameObject.SetActive(false);
         m_gamePanel.gameObject.SetActive(true);
         m_gamePanel.GetPlayer(m_players, CameraJump);
-        Debug.Log(Salary(m_orderPlayer));
     }
 }
