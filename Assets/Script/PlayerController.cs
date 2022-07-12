@@ -164,9 +164,9 @@ public class PlayerController : MonoBehaviour
     /// <param name="eventF">イベントフラグ</param>
     /// <param name="camera">追跡するカメラ</param>
     /// <returns></returns>
-    public Coroutine MoveStart(int m, bool reverse, bool eventF, CameraController camera)
+    public Coroutine MoveStart(Vector3 next, CameraController camera)
     {
-        return StartCoroutine(Move(m, reverse, eventF, camera));
+        return StartCoroutine(Move(next, camera));
     }
     /// <summary>
     /// 移動するコルーチン
@@ -176,70 +176,38 @@ public class PlayerController : MonoBehaviour
     /// /// <param name="e">イベントフラグ</param>
     /// /// <param name="c">カメラ</param>
     /// <returns></returns>
-    IEnumerator Move(int m, bool reverse, bool e, CameraController c)
+    IEnumerator Move(Vector3 next, CameraController c)
     {
         yield return null;
-        for (int i = 0; i < m; i++)
+        Vector3 now = m_location.StopPint.position;
+        float x = now.x;
+        float y = now.y;
+        float z = now.z;
+        int f = 1;
+        while (f > 0)
         {
-            Vector3 now = m_location.StopPint.position;
-            RoadController nextPint;
-            if (!reverse)
+            f = 0;
+            if (NumberDifference(x, next.x) > 0.1f)
             {
-                nextPint = m_location.NextRoad(m_branchNumber);
-                transform.LookAt(nextPint.transform.position);
+                x += Moving(x, next.x);
+                f++;
             }
-            else
+            if (NumberDifference(y, next.y) > 0.1f)
             {
-                nextPint = m_location.PrevRoad;
+                y += Moving(y, next.y);
+                f++;
             }
-            Vector3 next = nextPint.StopPint.position;
-            float x = now.x;
-            float y = now.y;
-            float z = now.z;
-            int f = 1;
-            while (f > 0)
+            if (NumberDifference(z, next.z) > 0.1f)
             {
-                f = 0;
-                if (NumberDifference(x, next.x) > 0.1f)
-                {
-                    x += Moving(x, next.x);
-                    f++;
-                }
-                if (NumberDifference(y, next.y) > 0.1f)
-                {
-                    y += Moving(y, next.y);
-                    f++;
-                }
-                if (NumberDifference(z, next.z) > 0.1f)
-                {
-                    z += Moving(z, next.z);
-                    f++;
-                }
-                transform.position = new Vector3(x, y, z);
-                c.PositionSet(transform.position);
-                yield return null;
+                z += Moving(z, next.z);
+                f++;
             }
-            transform.position = next;
-            m_location = nextPint;
-            if (m_location.NextRoad(m_branchNumber) == null)
-            {
-                reverse = true;
-            }
-            if (m_location.Event == RoadEvents.Payday && !e && !reverse)
-            {
-                PaydayFlag = true;
-            }
-            if (m_location.StopFlag && !e)
-            {
-                break;
-            }
-            if(m_location.Event == RoadEvents.RoadBranch && i != m - 1)
-            {
-                yield return StartCoroutine(m_gameManager.Branch(this));
-            }
+            transform.position = new Vector3(x, y, z);
+            c.PositionSet(transform.position);
             yield return null;
         }
-        m_gameManager.Progress();
+        transform.position = next;
+        yield return null;
     }
     /// <summary>
     /// 動く距離を返す

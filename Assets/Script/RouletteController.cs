@@ -116,7 +116,6 @@ public class RouletteController : MonoBehaviour
         m_lid.SetActive(false);
         yield return new WaitForSeconds(1f);
         m_StartButton.SetActive(true);
-        this.gameObject.SetActive(false);
-        m_gameManager.Progress();
+        gameObject.SetActive(false);
     }
 }

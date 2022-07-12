@@ -76,7 +76,6 @@ public class GameManager : MonoBehaviour
     ProgressState m_progressState = ProgressState.FadeIn;
     /// <summary>プレイヤー進行のステート</summary>
     EventState m_eventState = EventState.Normal;
-
     List<PlayerController> m_backClipGoku = new List<PlayerController>();
     void Start()
     {
@@ -86,7 +85,6 @@ public class GameManager : MonoBehaviour
         //m_Roads = new RoadController[5, 2, 20];
         m_first.RoadSetUp(null, m_first.RoadNumber, this);
     }
-
     /// <summary>
     /// マスの情報を取得する
     /// </summary>
@@ -184,12 +182,11 @@ public class GameManager : MonoBehaviour
             case ProgressState.TurnText:
                 m_gamePanel.ProgressText.SetActive(false);
                 m_progressState = ProgressState.Roulette;
-                m_roulette.gameObject.SetActive(true);
-                m_roulette.RouletteStart(true);
+                StartCoroutine(Roulette());
                 break;
             case ProgressState.Roulette:
                 m_progressState = ProgressState.PlayerMove;
-                m_orderPlayer.MoveStart(m_roulette.Number, false, false, m_camera);
+                StartCoroutine(PlayerMove(m_roulette.Number, false, false, m_orderPlayer));
                 break;
             case ProgressState.PlayerMove:
                 m_progressState = ProgressState.RoadText;
@@ -231,6 +228,12 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+    IEnumerator Roulette()
+    {
+        m_roulette.gameObject.SetActive(true);
+        yield return m_roulette.RouletteStart(true);
+        Progress();
+    }
     /// <summary>
     /// マスのイベント
     /// </summary>
@@ -241,10 +244,10 @@ public class GameManager : MonoBehaviour
         switch (road.Event)
         {
             case RoadEvents.Go:
-                player.MoveStart(road.EventParameter, false, true, m_camera);
+                StartCoroutine(PlayerMove(road.EventParameter, false, true, player));
                 break;
             case RoadEvents.Return:
-                player.MoveStart(road.EventParameter, true, true, m_camera);
+                StartCoroutine(PlayerMove(road.EventParameter, true, true, player));
                 break;
             case RoadEvents.Rest:
                 player.Rest = true;
@@ -281,14 +284,14 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(Branch(player));
                 break;
             case RoadEvents.PayRaise:
-                player.SalaryRank = player.SalaryRank + 1;
+                player.SalaryRank++;
                 m_gamePanel.TextDisplay(player.Owner.Name + "さんの給料ランクが上がった！");
                 m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 break;
             case RoadEvents.ReductionInPay:
                 if (player.SalaryRank <= 0)
                 {
-                    player.SalaryRank = player.SalaryRank - 1;
+                    player.SalaryRank--;
                     m_gamePanel.TextDisplay(player.Owner.Name + "さんの給料ランクが下がった・・・");
                     m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 }
@@ -321,9 +324,42 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="player">移動するプレイヤー</param>
     /// <returns></returns>
-    IEnumerator PlayerMove(PlayerController player)
+    IEnumerator PlayerMove(int m, bool e, bool reverse, PlayerController player)
     {
-        yield return null;
+        for (int i = 0; i < m; i++)
+        {
+            RoadController nextPint;
+            if (!reverse)
+            {
+                nextPint = player.Location.NextRoad(player.BranchNumber);
+                transform.LookAt(nextPint.transform.position);
+            }
+            else
+            {
+                nextPint = player.Location.PrevRoad;
+            }
+            Vector3 next = nextPint.StopPint.position;
+            yield return player.MoveStart(next, m_camera);
+            player.Location = nextPint;
+            if (player.Location.NextRoad(player.BranchNumber) == null)
+            {
+                reverse = true;
+            }
+            if (player.Location.Event == RoadEvents.Payday && !e && !reverse)
+            {
+                player.PaydayFlag = true;
+            }
+            if (player.Location.StopFlag && !e)
+            {
+                break;
+            }
+            if (player.Location.Event == RoadEvents.RoadBranch && i != m - 1)
+            {
+                yield return StartCoroutine(Branch(player));
+            }
+            yield return null;
+        }
+        Progress();
     }
     /// <summary>
     /// ゴールした際に手番と順位をソートする
@@ -440,7 +476,7 @@ public class GameManager : MonoBehaviour
             road = road.NextRoad(0);
             mv++;
         }
-        m_orderPlayer.MoveStart(mv, false, true, m_camera);
+        StartCoroutine(PlayerMove(mv, false, false, m_orderPlayer));
     }
     /// <summary>
     /// 他にバッククロージャー職人がいるか調べる
@@ -537,7 +573,6 @@ public class GameManager : MonoBehaviour
         Progress();
         m_fadePanel.gameObject.SetActive(false);
     }
-
     void CameraJump(Vector3 point)
     {
         m_camera.PositionSet(point);
@@ -558,9 +593,5 @@ public class GameManager : MonoBehaviour
         m_entryPanel.gameObject.SetActive(false);
         m_gamePanel.gameObject.SetActive(true);
         m_gamePanel.GetPlayer(m_players, CameraJump);
-    }
-    public void Test()
-    {
-        Debug.Log(Salary(m_players[0]));
     }
 }
