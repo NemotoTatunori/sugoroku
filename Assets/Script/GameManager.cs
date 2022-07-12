@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class GameManager : MonoBehaviour
 {
-    /// <summary>進行のステート</summary>
+    /// <summary>ゲーム進行のステート</summary>
     enum ProgressState
     {
         /// <summary>フェードイン</summary>
@@ -27,6 +28,18 @@ public class GameManager : MonoBehaviour
         /// <summary>手番交換</summary>
         PlayerCheck = 8,
     }
+    /// <summary>プレイヤー進行のステート</summary>
+    enum EventState
+    {
+        /// <summary>通常</summary>
+        Normal = 0,
+        /// <summary>プレイヤー行動選択</summary>
+        PlayerSelection = 1,
+        /// <summary>プレイヤー移動</summary>
+        PlayerMove = 2,
+        /// <summary>プレイヤーイベント</summary>
+        PlayerEvent = 3,
+    }
     /// <summary>フェードパネル</summary>
     [SerializeField] Image m_fadePanel = null;
     /// <summary>エントリーパネルパネル</summary>
@@ -35,28 +48,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GamePanelController m_gamePanel = null;
     /// <summary>ゲームオーバーパネル</summary>
     [SerializeField] GameOverPanelController m_gameOverPanel = null;
-    /// <summary>職業一覧</summary>
-    string[] m_professions = {
-        "フリーター", "プログラマー", "大工","フグ", "お笑い芸人のサポーター",
-        "Googleの社員","キャップ職人","なんかめっちゃ社会貢献してる人","漁師","絵師",
-        "パティシエ","アニメとかでボコボコにされる人","アルプスの少女","めっちゃ論破する人","社会不適合者",
-        "料理人","バッククロージャー職人 極","バッククロージャー職人 剣","バッククロージャー職人 獄","バッククロージャー職人 ゴッド"
-    };
-    /// <summary>給料一覧</summary>
-    int[] m_salarys = {
-        100000,200000,220000,400000,400000,
-        500000,100000,250000,150000,300000,
-        230000,280000,140000,320000,10000,
-        230000,300000,350000,400000,600000
-        
-    };
-    /// <summary>給料昇給倍率</summary>
-    float[] m_magnification = {
-        0.2f,0.2f,0.2f,0.2f,0.2f,
-        0.2f,0.2f,0.2f,0.2f,0.2f,
-        0.2f,0.2f,0.2f,0.2f,0.2f,
-        0.2f,0.2f,0.2f,0.2f
-    };
+    /// <summary>職業データ</summary>
+    [SerializeField] WorkData m_workData = null;
     /// <summary>ゴールした時のボーナス</summary>
     int m_goalBonus = 1000000;
     /// <summary>ゴールした人数</summary>
@@ -70,7 +63,7 @@ public class GameManager : MonoBehaviour
     /// <summary>ゴールした人たちの金額順位</summary>
     PlayerController[] m_goalRanking = null;
     /// <summary>マスの配列</summary>
-    RoadController[,,] m_Roads;
+    //RoadController[,,] m_Roads;
     /// <summary>手番を管理する</summary>
     int m_order = 0;
     /// <summary>現在手番のプレイヤー</summary>
@@ -79,15 +72,18 @@ public class GameManager : MonoBehaviour
     RouletteController m_roulette = null;
     /// <summary>ルーレットのデフォルト数</summary>
     int[] m_rouletteLineupDefault = { 1, 2, 3, 4, 5 };
-    /// <summary>進行のステート</summary>
-    ProgressState m_state = ProgressState.FadeIn;
+    /// <summary>ゲーム進行のステート</summary>
+    ProgressState m_progressState = ProgressState.FadeIn;
+    /// <summary>プレイヤー進行のステート</summary>
+    EventState m_eventState = EventState.Normal;
 
+    List<PlayerController> m_backClipGoku = new List<PlayerController>();
     void Start()
     {
         m_gamePanel.GetGameManager(this);
         m_roulette = m_gamePanel.Roulette;
         m_entryPanel.GetGameManager(this, m_first);
-        m_Roads = new RoadController[5, 2, 20];
+        //m_Roads = new RoadController[5, 2, 20];
         m_first.RoadSetUp(null, m_first.RoadNumber, this);
     }
 
@@ -103,7 +99,7 @@ public class GameManager : MonoBehaviour
         {
             irn[i] = int.Parse(srn[i]);
         }
-        m_Roads[irn[0], irn[1], irn[2]] = rc;
+        //m_Roads[irn[0], irn[1], irn[2]] = rc;
     }
     /// <summary>
     /// 手番を変える
@@ -122,7 +118,7 @@ public class GameManager : MonoBehaviour
             }
             m_orderPlayer = m_players[m_order];
             m_roulette.GetLineup(m_rouletteLineupDefault);
-            m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_professions);
+            m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_workData);
             Progress();
         }
         else
@@ -139,52 +135,73 @@ public class GameManager : MonoBehaviour
     /// <returns>給料</returns>
     int Salary(PlayerController player)
     {
-        float salaryOriginal = (float)m_salarys[player.Profession];
-        float magnification = m_magnification[player.Profession];
-        int salary =(int)salaryOriginal + (int)(salaryOriginal * magnification * player.SalaryRank);
+        float salaryOriginal = m_workData.GetData(player.Profession).Salary;
+        float magnification = m_workData.GetData(player.Profession).Magnification;
+        int salary = (int)salaryOriginal + (int)(salaryOriginal * magnification * player.SalaryRank);
         return salary;
+    }
+    /// <summary>
+    /// プレイヤー行動ステート管理
+    /// </summary>
+    public void EndReport()
+    {
+        switch (m_eventState)
+        {
+            case EventState.Normal:
+                Progress();
+                break;
+            case EventState.PlayerSelection:
+
+                break;
+            case EventState.PlayerMove:
+
+                break;
+            case EventState.PlayerEvent:
+
+                break;
+        }
     }
     /// <summary>
     /// ゲーム進行のステート管理
     /// </summary>
     public void Progress()
     {
-        switch (m_state)
+        switch (m_progressState)
         {
             case ProgressState.FadeIn:
                 if (!m_orderPlayer.Rest)
                 {
-                    m_state = ProgressState.TurnText;
+                    m_progressState = ProgressState.TurnText;
                     m_gamePanel.TextDisplay(m_orderPlayer.Owner.Name + "さんの番です");
                 }
                 else
                 {
-                    m_state = ProgressState.TurnEnd;
+                    m_progressState = ProgressState.TurnEnd;
                     m_gamePanel.TextDisplay(m_orderPlayer.Owner.Name + "さんはお休みのようです");
                     m_orderPlayer.Rest = false;
                 }
                 break;
             case ProgressState.TurnText:
                 m_gamePanel.ProgressText.SetActive(false);
-                m_state = ProgressState.Roulette;
+                m_progressState = ProgressState.Roulette;
                 m_roulette.gameObject.SetActive(true);
                 m_roulette.RouletteStart(true);
                 break;
             case ProgressState.Roulette:
-                m_state = ProgressState.PlayerMove;
+                m_progressState = ProgressState.PlayerMove;
                 m_orderPlayer.MoveStart(m_roulette.Number, false, false, m_camera);
                 break;
             case ProgressState.PlayerMove:
-                m_state = ProgressState.RoadText;
+                m_progressState = ProgressState.RoadText;
                 m_gamePanel.TextDisplay(m_orderPlayer.Location.EventText());
                 break;
             case ProgressState.RoadText:
                 m_gamePanel.ProgressText.SetActive(false);
-                m_state = ProgressState.Event;
+                m_progressState = ProgressState.Event;
                 RoadEvent(m_orderPlayer);
                 break;
             case ProgressState.Event:
-                m_state = ProgressState.TurnEnd;
+                m_progressState = ProgressState.TurnEnd;
                 m_gamePanel.PlayerJumpButtonList.SetActive(true);
                 m_gamePanel.ProgressText.SetActive(false);
                 m_camera.Move = true;
@@ -193,11 +210,11 @@ public class GameManager : MonoBehaviour
             case ProgressState.TurnEnd:
                 m_gamePanel.PlayerJumpButtonList.SetActive(false);
                 m_gamePanel.TurnEndButton.SetActive(false);
-                m_state = ProgressState.FadeOut;
+                m_progressState = ProgressState.FadeOut;
                 StartCoroutine(Fade(false));
                 break;
             case ProgressState.FadeOut:
-                m_state = ProgressState.PlayerCheck;
+                m_progressState = ProgressState.PlayerCheck;
                 if (m_orderPlayer.PaydayFlag)
                 {
                     m_orderPlayer.GetMoney(Salary(m_orderPlayer));
@@ -209,7 +226,7 @@ public class GameManager : MonoBehaviour
                 m_camera.Move = false;
                 break;
             case ProgressState.PlayerCheck:
-                m_state = ProgressState.FadeIn;
+                m_progressState = ProgressState.FadeIn;
                 StartCoroutine(Fade(true));
                 break;
         }
@@ -236,20 +253,20 @@ public class GameManager : MonoBehaviour
             case RoadEvents.GetMoney:
                 player.GetMoney(road.EventParameter);
                 m_gamePanel.TextDisplay(player.Owner.Name + "さんは" + road.EventParameter + "得た！");
-                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
+                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 break;
             case RoadEvents.PayMoney:
                 player.GetMoney(-road.EventParameter);
                 m_gamePanel.TextDisplay(player.Owner.Name + "さんは" + road.EventParameter + "支払った");
-                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
+                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 break;
             case RoadEvents.FindWork:
-                m_gamePanel.FindWorkText(m_professions[road.EventParameter]);
+                m_gamePanel.FindWorkText(m_workData.GetData(road.EventParameter).WorkName.ToString());
                 break;
             case RoadEvents.Payday:
                 player.GetMoney(Salary(m_orderPlayer));
                 m_gamePanel.TextDisplay(player.Owner.Name + "さんは給料として" + Salary(m_orderPlayer) + "得た！");
-                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
+                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 player.PaydayFlag = false;
                 break;
             case RoadEvents.Marriage:
@@ -266,14 +283,14 @@ public class GameManager : MonoBehaviour
             case RoadEvents.PayRaise:
                 player.SalaryRank = player.SalaryRank + 1;
                 m_gamePanel.TextDisplay(player.Owner.Name + "さんの給料ランクが上がった！");
-                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
+                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 break;
             case RoadEvents.ReductionInPay:
                 if (player.SalaryRank <= 0)
                 {
                     player.SalaryRank = player.SalaryRank - 1;
                     m_gamePanel.TextDisplay(player.Owner.Name + "さんの給料ランクが下がった・・・");
-                    m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
+                    m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 }
                 else
                 {
@@ -294,10 +311,19 @@ public class GameManager : MonoBehaviour
                 {
                     m_gamePanel.TextDisplay(player.Owner.Name + "が" + m_goalNumber + "位でゴールした！\n賞金はもらえなかった・・・");
                 }
-                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_professions);
+                m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 PlayersSort(player);
                 break;
         }
+    }
+    /// <summary>
+    /// プレイヤー移動
+    /// </summary>
+    /// <param name="player">移動するプレイヤー</param>
+    /// <returns></returns>
+    IEnumerator PlayerMove(PlayerController player)
+    {
+        yield return null;
     }
     /// <summary>
     /// ゴールした際に手番と順位をソートする
@@ -347,7 +373,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
         Congratulations(m_players[m_order], m_players[m_order].Location.EventParameter);
-        m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_professions);
+        m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_workData);
     }
     /// <summary>
     /// 祝い金処理
@@ -378,37 +404,95 @@ public class GameManager : MonoBehaviour
             Progress();
             return;
         }
-        m_state = ProgressState.RoadText;
-        PlayerController player = m_players[m_order];
-        RoadController road = player.Location;
-        player.Profession = road.EventParameter;
+        m_progressState = ProgressState.RoadText;
+        RoadController road = m_orderPlayer.Location;
+        if (road.EventParameter != 18)
+        {
+            m_orderPlayer.Profession = road.EventParameter;
+        }
+        else
+        {
+            m_backClipGoku.Add(m_orderPlayer);
+            if (CheckBackClip())
+            {
+                m_orderPlayer.Profession = road.EventParameter + 1;
+            }
+            else
+            {
+                m_orderPlayer.Profession = road.EventParameter;
+            }
+        }
+        if (m_backClipGoku.Count != 0)
+        {
+            if (CheckBackClip())
+            {
+                foreach (var item in m_backClipGoku)
+                {
+                    item.Profession = m_workData.m_works.Count - 1;
+                }
+            }
+        }
+
+        m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_orderPlayer, m_workData);
         int mv = 1;
         while (road.NextRoad(0).Event != RoadEvents.Payday)
         {
             road = road.NextRoad(0);
             mv++;
-            if (mv >= 100)
+        }
+        m_orderPlayer.MoveStart(mv, false, true, m_camera);
+    }
+    /// <summary>
+    /// 他にバッククロージャー職人がいるか調べる
+    /// </summary>
+    /// <returns>いる、いない</returns>
+    bool CheckBackClip()
+    {
+        int[] line = { 16, 17, 18, 19 };
+        return CheckProfession(line, false);
+    }
+    /// <summary>
+    /// 指定の職業がいるか調べる
+    /// </summary>
+    /// <param name="proNum">調べる職業番号</param>
+    /// <param name="inOrderPlayer">手番者を含めるか</param>
+    /// <returns></returns>
+    bool CheckProfession(int[] proNum, bool inOrderPlayer)
+    {
+        foreach (var item in m_players)
+        {
+            if (!inOrderPlayer && item == m_orderPlayer) { continue; }
+            for (int i = 0; i < proNum.Length; i++)
             {
-                mv = 0;
-                Debug.Log("無限ループ");
-                break;
+                if (item.Profession == proNum[i])
+                {
+                    return true;
+                }
             }
         }
-        player.MoveStart(mv, false, true, m_camera);
+        return false;
     }
     /// <summary>
     /// 分岐道の行先を決める
     /// </summary>
     /// <param name="player">決めるプレイヤー</param>
     /// <returns></returns>
-    IEnumerator Branch(PlayerController player)
+    public IEnumerator Branch(PlayerController player)
     {
-        int r = player.Location.NextRoads.Length;
+        int r = player.Location.EventParameter;
         m_roulette.gameObject.SetActive(true);
         string[] lineup;
-        if (r == 2)
+        if (r == 0)
         {
             lineup = new string[] { "左", "右" };
+        }
+        else if (r == 1)
+        {
+            lineup = new string[] { "左", "真中" };
+        }
+        else if (r == 2)
+        {
+            lineup = new string[] { "真中", "右" };
         }
         else
         {
@@ -465,14 +549,18 @@ public class GameManager : MonoBehaviour
     {
         m_players = players;
         m_goalRanking = new PlayerController[m_players.Length];
-        m_state = ProgressState.PlayerCheck;
+        m_progressState = ProgressState.PlayerCheck;
         m_order = 0;
         m_orderPlayer = m_players[m_order];
         m_orderPlayer.transform.position = m_first.StopPint.position;
-        m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_professions);
+        m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_workData);
         StartCoroutine(Fade(false));
         m_entryPanel.gameObject.SetActive(false);
         m_gamePanel.gameObject.SetActive(true);
         m_gamePanel.GetPlayer(m_players, CameraJump);
+    }
+    public void Test()
+    {
+        Debug.Log(Salary(m_players[0]));
     }
 }

@@ -29,8 +29,11 @@ public enum RoadEvents
     PayRaise = 10,
     /// <summary>~‹‹</summary>
     ReductionInPay = 11,
+    /// <summary>ƒKƒ`ƒƒ</summary>
+    Gashapon = 12,
+
     /// <summary>ƒS[ƒ‹</summary>
-    Goal = 12,
+    Goal = 13,
 }
 public class RoadController : MonoBehaviour
 {
@@ -101,6 +104,10 @@ public class RoadController : MonoBehaviour
         {
             m_roadColorDisplay.GetComponent<Renderer>().material = m_roadColors[1];
         }
+    }
+    void OnValidate()
+    {
+
     }
     /// <summary>
     /// ƒ}ƒXî•ñ‚ğİ’è‚·‚é

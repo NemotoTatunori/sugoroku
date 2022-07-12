@@ -17,7 +17,7 @@ public class RouletteController : MonoBehaviour
     [SerializeField] GameObject m_lid = null;
     /// <summary>選ばれる数字の配列</summary>
     int[] m_lineup = { 1, 2, 3, 4, 5 };
-    /// <summary>選ばれる数字の配列</summary>
+    /// <summary>選ばれる文字の配列</summary>
     string[] m_branchRoadLineup = { "左", "右" };
     /// <summary>ルーレット始動のフラグ</summary>
     bool m_start = false;
@@ -72,10 +72,11 @@ public class RouletteController : MonoBehaviour
     /// <summary>
     /// ルーレットを動かす
     /// </summary>
+    /// <param name="EventFlag">イベントのフラグ</param>
     /// <returns></returns>
-    IEnumerator Roulette(bool f)
+    IEnumerator Roulette(bool EventFlag)
     {
-        int loop = f ? m_lineup.Length - 1 : m_branchRoadLineup.Length - 1;
+        int loop = EventFlag ? m_lineup.Length - 1 : m_branchRoadLineup.Length - 1;
         m_lid.SetActive(true);
         int n = 0;
         float interval = 0;
@@ -84,6 +85,14 @@ public class RouletteController : MonoBehaviour
             if (interval > m_speed)
             {
                 interval = 0;
+                if (EventFlag)
+                {
+                    m_numberDisplay.text = m_lineup[n].ToString();
+                }
+                else
+                {
+                    m_numberDisplay.text = m_branchRoadLineup[n];
+                }
                 n++;
                 if (n > loop)
                 {
@@ -94,7 +103,7 @@ public class RouletteController : MonoBehaviour
             interval += Time.deltaTime;
             yield return null;
         }
-        if (f)
+        if (EventFlag)
         {
             m_numberDisplay.text = m_lineup[n].ToString();
             m_number = m_lineup[n];

@@ -233,6 +233,10 @@ public class PlayerController : MonoBehaviour
             {
                 break;
             }
+            if(m_location.Event == RoadEvents.RoadBranch && i != m - 1)
+            {
+                yield return StartCoroutine(m_gameManager.Branch(this));
+            }
             yield return null;
         }
         m_gameManager.Progress();
