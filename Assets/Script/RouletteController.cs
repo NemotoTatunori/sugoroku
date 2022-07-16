@@ -23,18 +23,8 @@ public class RouletteController : MonoBehaviour
     bool m_start = false;
     /// <summary>出た数字</summary>
     int m_number = 0;
-
-    GameManager m_gameManager;
     /// <summary>出た数字のプロパティ</summary>
     public int Number => m_number;
-    /// <summary>
-    /// ゲームマネージャーを受け取る
-    /// </summary>
-    /// <param name="gm">ゲームマネージャー</param>
-    public void GetGameManager(GameManager gm)
-    {
-        m_gameManager = gm;
-    }
     /// <summary>
     /// ルーレットをスタートさせる
     /// </summary>

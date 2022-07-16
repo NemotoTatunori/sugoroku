@@ -57,7 +57,6 @@ public class GamePanelController : MonoBehaviour
     public void GetGameManager(GameManager gm)
     {
         m_gameManager = gm;
-        m_roulette.GetGameManager(gm);
         m_addHumanPanel.GetGameManager(gm);
     }
     /// <summary>

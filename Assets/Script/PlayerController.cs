@@ -180,6 +180,7 @@ public class PlayerController : MonoBehaviour
     {
         yield return null;
         Vector3 now = m_location.StopPint.position;
+        transform.LookAt(next);
         float x = now.x;
         float y = now.y;
         float z = now.z;

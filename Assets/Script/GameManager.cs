@@ -281,7 +281,7 @@ public class GameManager : MonoBehaviour
                 m_gamePanel.AddHumanPanel.Set(1);
                 break;
             case RoadEvents.RoadBranch:
-                StartCoroutine(Branch(player));
+                StartCoroutine(Branch(player, true));
                 break;
             case RoadEvents.PayRaise:
                 player.SalaryRank++;
@@ -355,7 +355,7 @@ public class GameManager : MonoBehaviour
             }
             if (player.Location.Event == RoadEvents.RoadBranch && i != m - 1)
             {
-                yield return StartCoroutine(Branch(player));
+                yield return StartCoroutine(Branch(player, false));
             }
             yield return null;
         }
@@ -513,7 +513,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="player">決めるプレイヤー</param>
     /// <returns></returns>
-    public IEnumerator Branch(PlayerController player)
+    public IEnumerator Branch(PlayerController player, bool pro)
     {
         int r = player.Location.EventParameter;
         m_roulette.gameObject.SetActive(true);
@@ -537,6 +537,10 @@ public class GameManager : MonoBehaviour
         m_roulette.GetBranchRoadLineup(lineup);
         yield return m_roulette.RouletteStart(false);
         player.BranchNumber = m_roulette.Number;
+        if (pro)
+        {
+            Progress();
+        }
     }
     /// <summary>
     /// フェードを制御する
@@ -570,8 +574,8 @@ public class GameManager : MonoBehaviour
             }
             m_fadePanel.color = new Color(0, 0, 0, 1);
         }
-        Progress();
         m_fadePanel.gameObject.SetActive(false);
+        Progress();
     }
     void CameraJump(Vector3 point)
     {
@@ -587,11 +591,30 @@ public class GameManager : MonoBehaviour
         m_progressState = ProgressState.PlayerCheck;
         m_order = 0;
         m_orderPlayer = m_players[m_order];
-        m_orderPlayer.transform.position = m_first.StopPint.position;
+        //m_orderPlayer.transform.position = m_first.StopPint.position;
         m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_workData);
-        StartCoroutine(Fade(false));
+        //StartCoroutine(Fade(false));
+        StartCoroutine(Opening());
         m_entryPanel.gameObject.SetActive(false);
         m_gamePanel.gameObject.SetActive(true);
         m_gamePanel.GetPlayer(m_players, CameraJump);
+    }
+    /// <summary>
+    /// オープニングムービー
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator Opening()
+    {
+        float start = m_players[0].transform.position.x;
+        float end = m_players.Length > 10 ? m_players[9].transform.position.x : m_players[m_players.Length - 1].transform.position.x;
+        Vector3 camera = new Vector3(start, 10, 20);
+        m_camera.transform.position = camera;
+        m_camera.transform.rotation = Quaternion.Euler(30, 180, 0);
+        while (start <= end)
+        {
+            start += Time.deltaTime * 10;
+            m_camera.transform.position = new Vector3(start, 10, 20);
+            yield return null;
+        }
     }
 }
