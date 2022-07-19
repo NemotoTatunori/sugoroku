@@ -1164,7 +1164,10 @@ MonoBehaviour:
   - {fileID: 8357156699937776832}
   m_prevConnect:
   - {fileID: 7682770236297091730}
-  m_nextRoads: []
+  m_nextRoads:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   m_prevRoads: []
   m_eventText: {fileID: 2247523296213647104}
   m_stopFlag: 1

@@ -208,7 +208,7 @@ public class GameManager : MonoBehaviour
                 m_gamePanel.PlayerJumpButtonList.SetActive(false);
                 m_gamePanel.TurnEndButton.SetActive(false);
                 m_progressState = ProgressState.FadeOut;
-                StartCoroutine(Fade(false));
+                StartCoroutine(Fade(false, true));
                 break;
             case ProgressState.FadeOut:
                 m_progressState = ProgressState.PlayerCheck;
@@ -224,7 +224,7 @@ public class GameManager : MonoBehaviour
                 break;
             case ProgressState.PlayerCheck:
                 m_progressState = ProgressState.FadeIn;
-                StartCoroutine(Fade(true));
+                StartCoroutine(Fade(true, true));
                 break;
         }
     }
@@ -547,7 +547,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="inOut"></param>
     /// <returns></returns>
-    IEnumerator Fade(bool inOut)
+    IEnumerator Fade(bool inOut, bool progress)
     {
         m_fadePanel.gameObject.SetActive(true);
         float c;
@@ -575,7 +575,11 @@ public class GameManager : MonoBehaviour
             m_fadePanel.color = new Color(0, 0, 0, 1);
         }
         m_fadePanel.gameObject.SetActive(false);
-        Progress();
+        if (progress)
+        {
+            Progress();
+        }
+
     }
     void CameraJump(Vector3 point)
     {
@@ -591,12 +595,8 @@ public class GameManager : MonoBehaviour
         m_progressState = ProgressState.PlayerCheck;
         m_order = 0;
         m_orderPlayer = m_players[m_order];
-        //m_orderPlayer.transform.position = m_first.StopPint.position;
         m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_workData);
-        //StartCoroutine(Fade(false));
         StartCoroutine(Opening());
-        m_entryPanel.gameObject.SetActive(false);
-        m_gamePanel.gameObject.SetActive(true);
         m_gamePanel.GetPlayer(m_players, CameraJump);
     }
     /// <summary>
@@ -605,16 +605,25 @@ public class GameManager : MonoBehaviour
     /// <returns></returns>
     IEnumerator Opening()
     {
+        yield return StartCoroutine(Fade(false, false));
+        m_entryPanel.gameObject.SetActive(false);
+        m_gamePanel.gameObject.SetActive(true);
         float start = m_players[0].transform.position.x;
         float end = m_players.Length > 10 ? m_players[9].transform.position.x : m_players[m_players.Length - 1].transform.position.x;
         Vector3 camera = new Vector3(start, 10, 20);
         m_camera.transform.position = camera;
         m_camera.transform.rotation = Quaternion.Euler(30, 180, 0);
+        yield return StartCoroutine(Fade(true, false));
         while (start <= end)
         {
             start += Time.deltaTime * 10;
             m_camera.transform.position = new Vector3(start, 10, 20);
             yield return null;
         }
+        yield return StartCoroutine(Fade(false, false));
+        m_orderPlayer.transform.position = m_first.StopPint.position;
+        CameraJump(m_orderPlayer.transform.position);
+        yield return StartCoroutine(Fade(true, false));
+        Progress();
     }
 }
