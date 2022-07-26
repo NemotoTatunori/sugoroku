@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ForkedRoadController : RoadController
 {
-    public override void RoadSetUp(RoadController road, string rn, GameManager gameManager)
+    [SerializeField] public bool m_sentaku;
+    public override void RoadSetUp(RoadController road, string rn, Action<RoadController> getRoad)
     {
-        m_gameManager = gameManager;
+        m_getRoad = getRoad;
         if (RoadNumber == "")
         {
             RoadNumber = rn;
@@ -26,7 +28,7 @@ public class ForkedRoadController : RoadController
                 Vector3 a = m_nextRoads[i].gameObject.transform.position;
                 m_nextRoads[i].PositionSetUp(a + (now - next));
             }
-            m_nextRoads[i].RoadSetUp(this, NextNumber(rn, i), gameManager);
+            m_nextRoads[i].RoadSetUp(this, NextNumber(rn, i), getRoad);
         }
     }
 
@@ -56,6 +58,4 @@ public class ForkedRoadController : RoadController
     {
         return m_nextRoads[branch];
     }
-
-    
 }

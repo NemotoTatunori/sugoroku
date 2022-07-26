@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 /// <summary>イベントの種類</summary>
 public enum RoadEvents
 {
@@ -66,7 +67,7 @@ public class RoadController : MonoBehaviour
     /// <summary>設定済のフラグ</summary>
     bool m_positionCorrection = false;
     /// <summary>ゲームマネージャー</summary>
-    protected GameManager m_gameManager;
+    protected Action<RoadController> m_getRoad;
     /// <summary>前のマスの接続部のプロパティ</summary>
     public Transform[] PrevConnect => m_prevConnect;
     /// <summary>マス番号のプロパティ</summary>
@@ -112,14 +113,14 @@ public class RoadController : MonoBehaviour
     /// <summary>
     /// マス情報を設定する
     /// </summary>
-    public virtual void RoadSetUp(RoadController road, string rn, GameManager gameManager)
+    public virtual void RoadSetUp(RoadController road, string rn, Action<RoadController> gameManager)
     {
         PrevRoadSet(road);
         if (m_positionCorrection)
         {
             return;
         }
-        m_gameManager = gameManager;
+        m_getRoad = gameManager;
         if (RoadNumber == "")
         {
             RoadNumber = rn;
@@ -136,7 +137,7 @@ public class RoadController : MonoBehaviour
             Vector3 a = m_nextRoads[0].gameObject.transform.position;
             m_nextRoads[0].PositionSetUp(a + (now - next));
         }
-        m_gameManager.GetRoads(this);
+        m_getRoad(this);
         m_nextRoads[0].RoadSetUp(this, NextNumber(RoadNumber, 0), gameManager);
         m_positionCorrection = true;
     }

@@ -632,6 +632,7 @@ MonoBehaviour:
   m_entryPanel: {fileID: 155599922}
   m_gamePanel: {fileID: 819067103}
   m_gameOverPanel: {fileID: 1522453889}
+  m_workData: {fileID: 11400000, guid: 2f872c3e08b0ce447b06d2fefc524c7a, type: 2}
   m_camera: {fileID: 963194229}
   m_first: {fileID: 453389504}
 --- !u!4 &637992304
@@ -770,6 +771,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1931476851606079874, guid: aacf1217282df65408a31e9cc7163b83, type: 3}
+      propertyPath: m_sentaku
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1931476851606079874, guid: aacf1217282df65408a31e9cc7163b83, type: 3}
+      propertyPath: m_stopFlag
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1931476851606079874, guid: aacf1217282df65408a31e9cc7163b83, type: 3}
       propertyPath: m_nextRoads.Array.data[0]
       value: 
@@ -2571,6 +2580,7 @@ MonoBehaviour:
   m_roadColors:
   - {fileID: 2100000, guid: ac729a8c111d22e41a7f831c6f04d290, type: 2}
   - {fileID: 2100000, guid: 877d9aaa3ea49734b839cf8cd30aa600, type: 2}
+  m_sentaku: 0
 --- !u!1 &3210135899042642427
 GameObject:
   m_ObjectHideFlags: 0

@@ -28,18 +28,6 @@ public class GameManager : MonoBehaviour
         /// <summary>手番交換</summary>
         PlayerCheck = 8,
     }
-    /// <summary>プレイヤー進行のステート</summary>
-    enum EventState
-    {
-        /// <summary>通常</summary>
-        Normal = 0,
-        /// <summary>プレイヤー行動選択</summary>
-        PlayerSelection = 1,
-        /// <summary>プレイヤー移動</summary>
-        PlayerMove = 2,
-        /// <summary>プレイヤーイベント</summary>
-        PlayerEvent = 3,
-    }
     /// <summary>フェードパネル</summary>
     [SerializeField] Image m_fadePanel = null;
     /// <summary>エントリーパネルパネル</summary>
@@ -74,16 +62,16 @@ public class GameManager : MonoBehaviour
     int[] m_rouletteLineupDefault = { 1, 2, 3, 4, 5 };
     /// <summary>ゲーム進行のステート</summary>
     ProgressState m_progressState = ProgressState.FadeIn;
-    /// <summary>プレイヤー進行のステート</summary>
-    EventState m_eventState = EventState.Normal;
+    /// <summary>他クラスの返事のフラグ</summary>
+    bool m_reply = false;
     List<PlayerController> m_backClipGoku = new List<PlayerController>();
     void Start()
     {
         m_gamePanel.GetGameManager(this);
         m_roulette = m_gamePanel.Roulette;
-        m_entryPanel.GetGameManager(this, m_first);
-        //m_Roads = new RoadController[5, 2, 20];
-        m_first.RoadSetUp(null, m_first.RoadNumber, this);
+        m_entryPanel.Setting(GameStart, m_first);
+        m_gamePanel.RoadBranchPanel.SetAction(SelectionBranch);
+        m_first.RoadSetUp(null, m_first.RoadNumber, GetRoads);
     }
     /// <summary>
     /// マスの情報を取得する
@@ -137,27 +125,6 @@ public class GameManager : MonoBehaviour
         float magnification = m_workData.GetData(player.Profession).Magnification;
         int salary = (int)salaryOriginal + (int)(salaryOriginal * magnification * player.SalaryRank);
         return salary;
-    }
-    /// <summary>
-    /// プレイヤー行動ステート管理
-    /// </summary>
-    public void EndReport()
-    {
-        switch (m_eventState)
-        {
-            case EventState.Normal:
-                Progress();
-                break;
-            case EventState.PlayerSelection:
-
-                break;
-            case EventState.PlayerMove:
-
-                break;
-            case EventState.PlayerEvent:
-
-                break;
-        }
     }
     /// <summary>
     /// ゲーム進行のステート管理
@@ -515,32 +482,54 @@ public class GameManager : MonoBehaviour
     /// <returns></returns>
     public IEnumerator Branch(PlayerController player, bool pro)
     {
-        int r = player.Location.EventParameter;
-        m_roulette.gameObject.SetActive(true);
-        string[] lineup;
-        if (r == 0)
+        int pattern = player.Location.EventParameter;
+        if (player.Location.gameObject.GetComponent<ForkedRoadController>().m_sentaku)
         {
-            lineup = new string[] { "左", "右" };
-        }
-        else if (r == 1)
-        {
-            lineup = new string[] { "左", "真中" };
-        }
-        else if (r == 2)
-        {
-            lineup = new string[] { "真中", "右" };
+            m_gamePanel.RoadBranchPanel.gameObject.SetActive(true);
+            m_gamePanel.RoadBranchPanel.Setting(pattern);
+            while (!m_reply)
+            {
+                yield return null;
+            }
+            m_reply = false;
         }
         else
         {
-            lineup = new string[] { "左", "真中", "右" };
+            m_roulette.gameObject.SetActive(true);
+            string[] lineup;
+            if (pattern == 0)
+            {
+                lineup = new string[] { "左", "右" };
+            }
+            else if (pattern == 1)
+            {
+                lineup = new string[] { "左", "真中" };
+            }
+            else if (pattern == 2)
+            {
+                lineup = new string[] { "真中", "右" };
+            }
+            else
+            {
+                lineup = new string[] { "左", "真中", "右" };
+            }
+            m_roulette.GetBranchRoadLineup(lineup);
+            yield return m_roulette.RouletteStart(false);
+            player.BranchNumber = m_roulette.Number;
+            if (pro)
+            {
+                Progress();
+            }
         }
-        m_roulette.GetBranchRoadLineup(lineup);
-        yield return m_roulette.RouletteStart(false);
-        player.BranchNumber = m_roulette.Number;
-        if (pro)
-        {
-            Progress();
-        }
+    }
+    /// <summary>
+    /// 分岐選択の結果を受け取る
+    /// </summary>
+    /// <param name="road">行先</param>
+    public void SelectionBranch(int road)
+    {
+        m_reply = true;
+        m_orderPlayer.BranchNumber = road;
     }
     /// <summary>
     /// フェードを制御する

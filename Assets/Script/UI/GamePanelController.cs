@@ -16,6 +16,8 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] AddHumanPanelController m_addHumanPanel = null;
     /// <summary>就職パネルのテキスト</summary>
     [SerializeField] Text m_findWorkPanel = null;
+    /// <summary>道分岐パネル</summary>
+    [SerializeField] RoadBranchPanelController m_roadBranchPanel = null;
     /// <summary>プレイヤーボタンリスト</summary>
     [SerializeField] GameObject m_playerJumpButtonList = null;
     /// <summary>プレイヤーボタン</summary>
@@ -31,6 +33,8 @@ public class GamePanelController : MonoBehaviour
     public AddHumanPanelController AddHumanPanel => m_addHumanPanel;
     /// <summary>表示するテキストのプロパティ</summary>
     public GameObject ProgressText => m_progressText.transform.parent.gameObject;
+    /// <summary>道分岐パネルのプロパティ</summary>
+    public RoadBranchPanelController RoadBranchPanel => m_roadBranchPanel;
     /// <summary>ターンエンドボタンのプロパティ</summary>
     public GameObject TurnEndButton => m_turnEndButton;
     /// <summary>プレイヤーボタンリストのプロパティ</summary>

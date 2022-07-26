@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class EntryPanelController : MonoBehaviour
 {
@@ -28,15 +29,14 @@ public class EntryPanelController : MonoBehaviour
     Color m_manColor = new Color(0.6f, 1, 1);
     /// <summary>女の色（ピンク）</summary>
     Color m_womanColor = new Color(1, 0.6f, 1);
-
-    GameManager m_gameManager;
+    Action<PlayerController[]> m_gameStart;
     /// <summary>
     /// ゲームマネージャーを受け取る
     /// </summary>
     /// <param name="gm">ゲームマネージャー</param>
-    public void GetGameManager(GameManager gm,RoadController road)
+    public void Setting(Action<PlayerController[]> gameStart, RoadController road)
     {
-        m_gameManager = gm;
+        m_gameStart = gameStart;
         m_first = road;
     }
     /// <summary>
@@ -64,7 +64,7 @@ public class EntryPanelController : MonoBehaviour
             car.transform.position = new Vector3(px + x * 5, 0, z * -10);
             players[i] = car.GetComponent<PlayerController>();
             EntryNamePrefab en = m_entryNameDisplay.transform.GetChild(i).GetComponent<EntryNamePrefab>();
-            players[i].Seting(en.Seibetu, en.Name, m_first, m_gameManager);
+            players[i].Setting(en.Seibetu, en.Name, m_first);
             x++;
             if (x >= 10)
             {
@@ -72,7 +72,7 @@ public class EntryPanelController : MonoBehaviour
                 z++;
             }
         }
-        m_gameManager.GameStart(players);
+        m_gameStart(players);
     }
     /// <summary>
     /// エントリーさせる
