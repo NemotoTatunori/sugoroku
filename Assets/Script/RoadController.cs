@@ -7,34 +7,33 @@ using System;
 public enum RoadEvents
 {
     /// <summary>i‚Ş</summary>
-    Go = 0,
+    Go,
     /// <summary>–ß‚é</summary>
-    Return = 1,
+    Return,
     /// <summary>‹x‚İ</summary>
-    Rest = 2,
+    Rest,
     /// <summary>‚¨‹à‚ğ‚à‚ç‚¤</summary>
-    GetMoney = 3,
+    GetMoney,
     /// <summary>‚¨‹à‚ğ•¥‚¤</summary>
-    PayMoney = 4,
+    PayMoney,
     /// <summary>AE</summary>
-    FindWork = 5,
+    FindWork,
     /// <summary>‹‹—¿“ú</summary>
-    Payday = 6,
+    Payday,
     /// <summary>Œ‹¥</summary>
-    Marriage = 7,
+    Marriage,
     /// <summary>oY</summary>
-    Childbirth = 8,
+    Childbirth,
     /// <summary>•ªŠò</summary>
-    RoadBranch = 9,
+    RoadBranch,
     /// <summary>¸‹‹</summary>
-    PayRaise = 10,
+    PayRaise,
     /// <summary>~‹‹</summary>
-    ReductionInPay = 11,
-    /// <summary>ƒKƒ`ƒƒ</summary>
-    Gashapon = 12,
-
+    ReductionInPay,
+    /// <summary>‚¨•ó</summary>
+    Treasure,
     /// <summary>ƒS[ƒ‹</summary>
-    Goal = 13,
+    Goal,
 }
 public class RoadController : MonoBehaviour
 {

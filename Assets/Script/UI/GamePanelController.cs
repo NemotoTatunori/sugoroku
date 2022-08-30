@@ -24,6 +24,8 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] PlayerJumpButton m_playerJumpButtonPrefab = null;
     /// <summary>ターンエンドボタン</summary>
     [SerializeField] GameObject m_turnEndButton = null;
+    /// <summary>お宝パネル</summary>
+    [SerializeField] TreasurePanelController m_treasurePanel = null;
     GameManager m_gameManager;
     /// <summary>プレイヤーステータスボックスのプロパティ</summary>
     public PlayerStatusBoxController PlayerStatusBox => m_playerStatusBox;
@@ -39,6 +41,9 @@ public class GamePanelController : MonoBehaviour
     public GameObject TurnEndButton => m_turnEndButton;
     /// <summary>プレイヤーボタンリストのプロパティ</summary>
     public GameObject PlayerJumpButtonList => m_playerJumpButtonList;
+    /// <summary>お宝パネルのプロパティ</summary>
+    public TreasurePanelController TreasurePanel => m_treasurePanel;
+
     /// <summary>
     /// プレイヤージャンプボタン生成
     /// </summary>

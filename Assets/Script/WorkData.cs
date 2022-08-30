@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public enum WorkName
+public enum WorkNames
 {
     フリーター,
     プログラマー,
@@ -28,18 +28,18 @@ public enum WorkName
 [CreateAssetMenu(fileName = "WorkData")]
 public class WorkData : ScriptableObject
 {
-    [SerializeField] public List<Work> m_works = new List<Work>();
+    [SerializeField] List<Work> m_works = new List<Work>();
     public Work GetData(int id) => m_works[id];
-
+    public int WorkNum => m_works.Count;
 }
 
 [System.Serializable]
 public class Work
 {
-    [SerializeField] WorkName m_workName;
+    [SerializeField] WorkNames m_workName;
     [SerializeField] int m_salary;
     [SerializeField] float m_magnification;
-    public WorkName WorkName
+    public WorkNames WorkName
     {
         get
         {

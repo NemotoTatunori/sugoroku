@@ -267,6 +267,11 @@ public class GameManager : MonoBehaviour
                     m_gamePanel.TextDisplay(player.Owner.Name + "‚³‚ñ‚Ì‹‹—¿ƒ‰ƒ“ƒN‚Í‚±‚êˆÈã‰º‚ª‚ç‚È‚¢");
                 }
                 break;
+            case RoadEvents.Treasure:
+                player.Treasures.Add(road.EventParameter);
+                m_gamePanel.TextDisplay(player.Owner.Name + "‚³‚ñ‚Ì‚Í" + 
+                    m_gamePanel.TreasurePanel.TreasureData.GetData(road.EventParameter).TreasureName + "‚ğ“¾‚½I");
+                break;
             case RoadEvents.Goal:
                 int bonus = m_goalBonus - m_goalNumber * 100000;
                 player.Goal = true;
@@ -431,7 +436,7 @@ public class GameManager : MonoBehaviour
             {
                 foreach (var item in m_backClipGoku)
                 {
-                    item.Profession = m_workData.m_works.Count - 1;
+                    item.Profession = m_workData.WorkNum - 1;
                 }
             }
         }

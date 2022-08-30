@@ -21,6 +21,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] bool[] m_sittings = null;
     /// <summary>乗っている人たち</summary>
     [SerializeField] Human[] m_family;
+    /// <summary>お宝</summary>
+    List<int> m_treasures = new List<int>();
+    /// <summary>株券</summary>
+    int m_stockCertificate = 0;
     /// <summary>乗っている人数</summary>
     int m_familyNum = 0;
     /// <summary>給料日のフラグ</summary>
@@ -110,6 +114,8 @@ public class PlayerController : MonoBehaviour
             m_goal = value;
         }
     }
+
+    public List<int> Treasures => m_treasures;
 
     void Update()
     {

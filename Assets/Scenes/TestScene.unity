@@ -419,15 +419,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 219515488658960177, guid: 454e87d4c5123f4429875680d274760d, type: 3}
       propertyPath: m_event
-      value: 3
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 219515488658960177, guid: 454e87d4c5123f4429875680d274760d, type: 3}
       propertyPath: m_stopFlag
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 219515488658960177, guid: 454e87d4c5123f4429875680d274760d, type: 3}
       propertyPath: m_eventParameter
-      value: 3000
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 219515488658960177, guid: 454e87d4c5123f4429875680d274760d, type: 3}
       propertyPath: m_nextRoads.Array.size
