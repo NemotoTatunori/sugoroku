@@ -14,62 +14,65 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_works:
   - m_workName: 0
+    m_salary: 0
+    m_magnification: 0
+  - m_workName: 1
     m_salary: 100000
     m_magnification: 0.2
-  - m_workName: 1
+  - m_workName: 2
     m_salary: 200000
     m_magnification: 0.2
-  - m_workName: 2
-    m_salary: 220000
-    m_magnification: 0.2
   - m_workName: 3
-    m_salary: 400000
+    m_salary: 220000
     m_magnification: 0.2
   - m_workName: 4
     m_salary: 400000
     m_magnification: 0.2
   - m_workName: 5
-    m_salary: 500000
+    m_salary: 400000
     m_magnification: 0.2
   - m_workName: 6
-    m_salary: 100000
+    m_salary: 500000
     m_magnification: 0.2
   - m_workName: 7
-    m_salary: 250000
+    m_salary: 100000
     m_magnification: 0.2
   - m_workName: 8
-    m_salary: 150000
+    m_salary: 250000
     m_magnification: 0.2
   - m_workName: 9
-    m_salary: 300000
+    m_salary: 150000
     m_magnification: 0.2
   - m_workName: 10
-    m_salary: 230000
+    m_salary: 300000
     m_magnification: 0.2
   - m_workName: 11
-    m_salary: 280000
+    m_salary: 230000
     m_magnification: 0.2
   - m_workName: 12
-    m_salary: 140000
+    m_salary: 280000
     m_magnification: 0.2
   - m_workName: 13
-    m_salary: 320000
+    m_salary: 140000
     m_magnification: 0.2
   - m_workName: 14
-    m_salary: 10000
+    m_salary: 230000
     m_magnification: 0.2
   - m_workName: 15
-    m_salary: 230000
+    m_salary: 10000
     m_magnification: 0.2
   - m_workName: 16
     m_salary: 300000
     m_magnification: 0.2
   - m_workName: 17
-    m_salary: 350000
+    m_salary: 300000
     m_magnification: 0.2
   - m_workName: 18
-    m_salary: 400000
+    m_salary: 350000
     m_magnification: 0.2
   - m_workName: 19
+    m_salary: 400000
+    m_magnification: 0.2
+  - m_workName: 20
     m_salary: 600000
     m_magnification: 0.2

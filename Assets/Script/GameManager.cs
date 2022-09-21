@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -67,7 +66,7 @@ public class GameManager : MonoBehaviour
     List<PlayerController> m_backClipGoku = new List<PlayerController>();
     void Start()
     {
-        m_gamePanel.GetGameManager(this);
+        m_gamePanel.SetGameManager(this);
         m_roulette = m_gamePanel.Roulette;
         m_entryPanel.Setting(GameStart, m_first);
         m_gamePanel.RoadBranchPanel.SetAction(SelectionBranch);
@@ -103,7 +102,8 @@ public class GameManager : MonoBehaviour
                 m_order = 0;
             }
             m_orderPlayer = m_players[m_order];
-            m_roulette.GetLineup(m_rouletteLineupDefault);
+            m_roulette.SetLineup(m_rouletteLineupDefault);
+            m_roulette.Name = "ルーレット";
             m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_workData);
             Progress();
         }
@@ -114,16 +114,18 @@ public class GameManager : MonoBehaviour
         }
     }
     /// <summary>
-    /// 給料を返す
+    /// 家族全員の給料を返す
     /// </summary>
-    /// <param name="profession">職業</param>
-    /// <param name="salaryRank">ランク</param>
     /// <returns>給料</returns>
     int Salary(PlayerController player)
     {
-        float salaryOriginal = m_workData.GetData(player.Profession).Salary;
-        float magnification = m_workData.GetData(player.Profession).Magnification;
-        int salary = (int)salaryOriginal + (int)(salaryOriginal * magnification * player.SalaryRank);
+        int salary = 0;
+        for (int i = 0; i < player.FamilyNum; i++)
+        {
+            float salaryOriginal = m_workData.GetData(player.Family[i].Profession).Salary;
+            float magnification = m_workData.GetData(player.Family[i].Profession).Magnification;
+            salary += (int)salaryOriginal + (int)(salaryOriginal * magnification * player.Owner.SalaryRank);
+        }
         return salary;
     }
     /// <summary>
@@ -149,7 +151,7 @@ public class GameManager : MonoBehaviour
             case ProgressState.TurnText:
                 m_gamePanel.ProgressText.SetActive(false);
                 m_progressState = ProgressState.Roulette;
-                StartCoroutine(Roulette());
+                StartCoroutine(Roulette(false));
                 break;
             case ProgressState.Roulette:
                 m_progressState = ProgressState.PlayerMove;
@@ -157,7 +159,37 @@ public class GameManager : MonoBehaviour
                 break;
             case ProgressState.PlayerMove:
                 m_progressState = ProgressState.RoadText;
-                m_gamePanel.TextDisplay(m_orderPlayer.Location.EventText());
+                if (m_orderPlayer.Location.Event == RoadEvents.Go)
+                {
+                    m_gamePanel.TextDisplay(m_orderPlayer.Location.EventText() + "\n" +
+                        m_orderPlayer.Location.EventParameter + "進む");
+                }
+                else if (m_orderPlayer.Location.Event == RoadEvents.Return)
+                {
+                    m_gamePanel.TextDisplay(m_orderPlayer.Location.EventText() + "\n" +
+                        m_orderPlayer.Location.EventParameter + "戻る");
+                }
+                else if (m_orderPlayer.Location.Event == RoadEvents.Marriage)
+                {
+                    string text = m_orderPlayer.Location.EventText();
+                    string[] texts = text.Split(char.Parse("\n"));
+                    string[] seibetu = texts[0].Split(char.Parse("/"));
+                    texts[0] = m_orderPlayer.Owner.Seibetu ? seibetu[0] : seibetu[1];
+                    text = "";
+                    for (int i = 0; i < texts.Length; i++)
+                    {
+                        text += texts[i];
+                        if (i < texts.Length - 1)
+                        {
+                            text += "\n";
+                        }
+                    }
+                    m_gamePanel.TextDisplay(text);
+                }
+                else
+                {
+                    m_gamePanel.TextDisplay(m_orderPlayer.Location.EventText());
+                }
                 break;
             case ProgressState.RoadText:
                 m_gamePanel.ProgressText.SetActive(false);
@@ -195,11 +227,14 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
-    IEnumerator Roulette()
+    IEnumerator Roulette(bool e)
     {
         m_roulette.gameObject.SetActive(true);
         yield return m_roulette.RouletteStart(true);
-        Progress();
+        if (!e)
+        {
+            Progress();
+        }
     }
     /// <summary>
     /// マスのイベント
@@ -211,7 +246,7 @@ public class GameManager : MonoBehaviour
         switch (road.Event)
         {
             case RoadEvents.Go:
-                StartCoroutine(PlayerMove(road.EventParameter, false, true, player));
+                StartCoroutine(PlayerMove(road.EventParameter, true, false, player));
                 break;
             case RoadEvents.Return:
                 StartCoroutine(PlayerMove(road.EventParameter, true, true, player));
@@ -251,14 +286,14 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(Branch(player, true));
                 break;
             case RoadEvents.PayRaise:
-                player.SalaryRank++;
+                player.Owner.SalaryRank++;
                 m_gamePanel.TextDisplay(player.Owner.Name + "さんの給料ランクが上がった！");
                 m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 break;
             case RoadEvents.ReductionInPay:
-                if (player.SalaryRank <= 0)
+                if (player.Owner.SalaryRank <= 0)
                 {
-                    player.SalaryRank--;
+                    player.Owner.SalaryRank--;
                     m_gamePanel.TextDisplay(player.Owner.Name + "さんの給料ランクが下がった・・・");
                     m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
                 }
@@ -269,7 +304,7 @@ public class GameManager : MonoBehaviour
                 break;
             case RoadEvents.Treasure:
                 player.Treasures.Add(road.EventParameter);
-                m_gamePanel.TextDisplay(player.Owner.Name + "さんのは" + 
+                m_gamePanel.TextDisplay(player.Owner.Name + "さんのは" +
                     m_gamePanel.TreasurePanel.TreasureData.GetData(road.EventParameter).TreasureName + "を得た！");
                 break;
             case RoadEvents.Goal:
@@ -292,8 +327,11 @@ public class GameManager : MonoBehaviour
         }
     }
     /// <summary>
-    /// プレイヤー移動
+    /// プレイヤーの移動
     /// </summary>
+    /// <param name="m">移動数</param>
+    /// <param name="e">イベントフラグ</param>
+    /// <param name="reverse">戻るフラグ</param>
     /// <param name="player">移動するプレイヤー</param>
     /// <returns></returns>
     IEnumerator PlayerMove(int m, bool e, bool reverse, PlayerController player)
@@ -368,20 +406,59 @@ public class GameManager : MonoBehaviour
         {
             case 0:
                 bool s = m_players[m_order].Owner.Seibetu ? false : true;
-                m_players[m_order].AddHuman(s, name);
-                m_gamePanel.TextDisplay(m_players[m_order].Owner.Name + "さんは結婚した！");
+                int pro = Random.Range(0, m_workData.WorkNum - 5);
+                m_players[m_order].AddHuman(s, name, pro);
+                StartCoroutine(CongratulationsRoulette(m_players[m_order], m_players[m_order].Location.EventParameter));
                 break;
             case 1:
-                m_players[m_order].AddHuman(true, name);
-                m_gamePanel.TextDisplay(m_players[m_order].Owner.Name + "さん宅に男の子が生まれた！");
+                m_players[m_order].AddHuman(true, name, 0);
+                m_gamePanel.TextDisplay(m_players[m_order].Owner.Name + "さん宅に男の子が生まれた！\n" +
+                    "みんなからご祝儀として" + m_players[m_order].Location.EventParameter + "円もらった！");
+                Congratulations(m_players[m_order], m_players[m_order].Location.EventParameter);
                 break;
             case 2:
-                m_players[m_order].AddHuman(false, name);
-                m_gamePanel.TextDisplay(m_players[m_order].Owner.Name + "さん宅に女の子が生まれた！");
+                m_players[m_order].AddHuman(false, name, 0);
+                m_gamePanel.TextDisplay(m_players[m_order].Owner.Name + "さん宅に女の子が生まれた！\n" +
+                    "みんなからご祝儀として" + m_players[m_order].Location.EventParameter + "円もらった！");
+                Congratulations(m_players[m_order], m_players[m_order].Location.EventParameter);
                 break;
         }
-        Congratulations(m_players[m_order], m_players[m_order].Location.EventParameter);
         m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(m_players[m_order], m_workData);
+    }
+    /// <summary>
+    /// 祝い金ルーレット
+    /// </summary>
+    /// <param name="player">もらうプレイヤー</param>
+    /// <param name="money">もらう元の金額</param>
+    /// <returns></returns>
+    IEnumerator CongratulationsRoulette(PlayerController player, int money)
+    {
+        m_roulette.Name = "ご祝儀ルーレット";
+        int[] lineUp = { 0, 1, 2, 3 };
+        m_roulette.SetLineup(lineUp);
+        string oddsText = "";
+        oddsText += lineUp[0] + ":もらえない";
+        for (int i = 1; i < lineUp.Length; i++)
+        {
+            oddsText += "\n\n" + lineUp[i] + ":" + (money * i) + "円";
+        }
+        GameObject oddsPanel = m_gamePanel.OddsPanel;
+        oddsPanel.SetActive(true);
+        oddsPanel.transform.GetChild(0).GetComponent<Text>().text = oddsText;
+        yield return StartCoroutine(Roulette(true));
+        oddsPanel.SetActive(false);
+        string text = m_players[m_order].Owner.Name + "さんは結婚した！";
+        if (m_roulette.Number == 0)
+        {
+            text += "\n" + "ご祝儀はもらえなかった・・・";
+        }
+        else
+        {
+            Congratulations(player, money * m_roulette.Number);
+            text += "\n" + "ご祝儀としてみんなから" + (money * m_roulette.Number) + "円もらった！";
+        }
+        m_gamePanel.TextDisplay(text);
+        m_gamePanel.PlayerStatusBox.PlayerStatusBoxUpdata(player, m_workData);
     }
     /// <summary>
     /// 祝い金処理
@@ -416,18 +493,18 @@ public class GameManager : MonoBehaviour
         RoadController road = m_orderPlayer.Location;
         if (road.EventParameter != 18)
         {
-            m_orderPlayer.Profession = road.EventParameter;
+            m_orderPlayer.Owner.Profession = road.EventParameter;
         }
         else
         {
             m_backClipGoku.Add(m_orderPlayer);
             if (CheckBackClip())
             {
-                m_orderPlayer.Profession = road.EventParameter + 1;
+                m_orderPlayer.Owner.Profession = road.EventParameter + 1;
             }
             else
             {
-                m_orderPlayer.Profession = road.EventParameter;
+                m_orderPlayer.Owner.Profession = road.EventParameter;
             }
         }
         if (m_backClipGoku.Count != 0)
@@ -436,7 +513,7 @@ public class GameManager : MonoBehaviour
             {
                 foreach (var item in m_backClipGoku)
                 {
-                    item.Profession = m_workData.WorkNum - 1;
+                    item.Owner.Profession = m_workData.WorkNum - 1;
                 }
             }
         }
@@ -472,7 +549,7 @@ public class GameManager : MonoBehaviour
             if (!inOrderPlayer && item == m_orderPlayer) { continue; }
             for (int i = 0; i < proNum.Length; i++)
             {
-                if (item.Profession == proNum[i])
+                if (item.Owner.Profession == proNum[i])
                 {
                     return true;
                 }
@@ -500,7 +577,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            m_roulette.gameObject.SetActive(true);
+            m_roulette.Name = "行先ルーレット";
             string[] lineup;
             if (pattern == 0)
             {
@@ -518,8 +595,8 @@ public class GameManager : MonoBehaviour
             {
                 lineup = new string[] { "左", "真中", "右" };
             }
-            m_roulette.GetBranchRoadLineup(lineup);
-            yield return m_roulette.RouletteStart(false);
+            m_roulette.SetBranchRoadLineup(lineup);
+            yield return Roulette(false);
             player.BranchNumber = m_roulette.Number;
             if (pro)
             {

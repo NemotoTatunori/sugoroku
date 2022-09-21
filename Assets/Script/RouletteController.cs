@@ -5,7 +5,9 @@ using UnityEngine.UI;
 
 public class RouletteController : MonoBehaviour
 {
-    /// <summary>数字を表示するテキスト</summary>
+    /// <summary>名目のテキスト</summary>
+    [SerializeField] Text m_name = null;
+    /// <summary>結果を表示するテキスト</summary>
     [SerializeField] Text m_numberDisplay = null;
     /// <summary>スタートボタン</summary>
     [SerializeField] GameObject m_StartButton = null;
@@ -23,6 +25,14 @@ public class RouletteController : MonoBehaviour
     bool m_start = false;
     /// <summary>出た数字</summary>
     int m_number = 0;
+    public string Name
+    {
+        get => m_name.text;
+        set
+        {
+            m_name.text = value;
+        }
+    }
     /// <summary>出た数字のプロパティ</summary>
     public int Number => m_number;
     /// <summary>
@@ -39,7 +49,7 @@ public class RouletteController : MonoBehaviour
     /// 選ばれる数字の候補を受け取る
     /// </summary>
     /// <param name="lineup">候補</param>
-    public void GetLineup(int[] lineup)
+    public void SetLineup(int[] lineup)
     {
         m_lineup = lineup;
     }
@@ -47,7 +57,7 @@ public class RouletteController : MonoBehaviour
     /// 選ばれる分岐道の候補を受け取る
     /// </summary>
     /// <param name="lineup">候補</param>
-    public void GetBranchRoadLineup(string[] lineup)
+    public void SetBranchRoadLineup(string[] lineup)
     {
         m_branchRoadLineup = lineup;
     }
@@ -62,11 +72,11 @@ public class RouletteController : MonoBehaviour
     /// <summary>
     /// ルーレットを動かす
     /// </summary>
-    /// <param name="EventFlag">イベントのフラグ</param>
+    /// <param name="IntFlag">イベントのフラグ</param>
     /// <returns></returns>
-    IEnumerator Roulette(bool EventFlag)
+    IEnumerator Roulette(bool IntFlag)
     {
-        int loop = EventFlag ? m_lineup.Length - 1 : m_branchRoadLineup.Length - 1;
+        int loop = IntFlag ? m_lineup.Length - 1 : m_branchRoadLineup.Length - 1;
         m_lid.SetActive(true);
         int n = 0;
         float interval = 0;
@@ -75,7 +85,7 @@ public class RouletteController : MonoBehaviour
             if (interval > m_speed)
             {
                 interval = 0;
-                if (EventFlag)
+                if (IntFlag)
                 {
                     m_numberDisplay.text = m_lineup[n].ToString();
                 }
@@ -93,7 +103,7 @@ public class RouletteController : MonoBehaviour
             interval += Time.deltaTime;
             yield return null;
         }
-        if (EventFlag)
+        if (IntFlag)
         {
             m_numberDisplay.text = m_lineup[n].ToString();
             m_number = m_lineup[n];

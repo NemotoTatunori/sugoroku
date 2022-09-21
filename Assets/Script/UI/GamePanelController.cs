@@ -26,6 +26,8 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] GameObject m_turnEndButton = null;
     /// <summary>お宝パネル</summary>
     [SerializeField] TreasurePanelController m_treasurePanel = null;
+    /// <summary>オッズパネル</summary>
+    [SerializeField] GameObject m_oddsPanel = null;
     GameManager m_gameManager;
     /// <summary>プレイヤーステータスボックスのプロパティ</summary>
     public PlayerStatusBoxController PlayerStatusBox => m_playerStatusBox;
@@ -43,6 +45,8 @@ public class GamePanelController : MonoBehaviour
     public GameObject PlayerJumpButtonList => m_playerJumpButtonList;
     /// <summary>お宝パネルのプロパティ</summary>
     public TreasurePanelController TreasurePanel => m_treasurePanel;
+    /// <summary>オッズパネルのプロパティ</summary>
+    public GameObject OddsPanel => m_oddsPanel;
 
     /// <summary>
     /// プレイヤージャンプボタン生成
@@ -63,10 +67,10 @@ public class GamePanelController : MonoBehaviour
     /// ゲームマネージャーの情報を受け取る
     /// </summary>
     /// <param name="gm">ゲームマネージャー</param>
-    public void GetGameManager(GameManager gm)
+    public void SetGameManager(GameManager gm)
     {
         m_gameManager = gm;
-        m_addHumanPanel.GetGameManager(gm);
+        m_addHumanPanel.SetGameManager(gm);
     }
     /// <summary>
     /// 表示するテキストを更新して表示する

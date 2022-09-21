@@ -54,7 +54,7 @@ public class AddHumanPanelController : MonoBehaviour
     /// ゲームマネージャーを受け取る
     /// </summary>
     /// <param name="gm">ゲームマネージャー</param>
-    public void GetGameManager(GameManager gm)
+    public void SetGameManager(GameManager gm)
     {
         m_gameManager = gm;
     }

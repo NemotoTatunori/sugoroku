@@ -436,18 +436,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc4564da2a1594b439834252fab73010, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ownerName: 
-  m_profession: 0
-  m_salaryRank: 0
+  m_owner: {fileID: 0}
   m_money: 0
   m_location: {fileID: 0}
-  m_Seats:
-  - {fileID: 4192577846530829763}
+  m_seats:
   - {fileID: 8863670870966486053}
-  - {fileID: 8422144372372376205}
+  - {fileID: 4192577846530829763}
   - {fileID: 431867842631351103}
-  - {fileID: 5478300958199588166}
+  - {fileID: 8422144372372376205}
   - {fileID: 3480119791429099270}
+  - {fileID: 5478300958199588166}
   m_sittings: 
   m_family: []
   m_rest: 0

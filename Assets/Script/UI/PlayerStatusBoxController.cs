@@ -20,7 +20,7 @@ public class PlayerStatusBoxController : MonoBehaviour
     {
         m_nameBox.text = p.Owner.Name;
         m_moneyBox.text = p.Money.ToString();
-        m_professionBox.text = professions.GetData(p.Profession).WorkName.ToString();
-        m_salaryRankBox.text = p.SalaryRank.ToString();
+        m_professionBox.text = professions.GetData(p.Owner.Profession).WorkName.ToString();
+        m_salaryRankBox.text = p.Owner.SalaryRank.ToString();
     }
 }
